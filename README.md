@@ -1,4 +1,3 @@
-````markdown
 # Speaken AI Tutor
 
 AI tutor with **voice role-play avatars** and **text chat**. Pick an avatar + language, talk in real time, or switch to plain text chat. Sessions can be saved to Supabase for later review.
