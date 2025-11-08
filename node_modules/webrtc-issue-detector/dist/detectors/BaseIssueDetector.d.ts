@@ -1,0 +1,21 @@
+import { IssueDetector, IssueDetectorResult, NetworkScores, WebRTCStatsParsed, WebRTCStatsParsedWithNetworkScores } from '../types';
+export interface PrevStatsCleanupPayload {
+    connectionId: string;
+    cleanupCallback?: () => void;
+}
+export interface BaseIssueDetectorParams {
+    statsCleanupTtlMs?: number;
+    maxParsedStatsStorageSize?: number;
+}
+declare abstract class BaseIssueDetector implements IssueDetector {
+    #private;
+    constructor(params?: BaseIssueDetectorParams);
+    abstract performDetection(data: WebRTCStatsParsedWithNetworkScores): IssueDetectorResult;
+    detect(data: WebRTCStatsParsed, networkScores?: NetworkScores): IssueDetectorResult;
+    protected performPrevStatsCleanup(payload: PrevStatsCleanupPayload): void;
+    protected setLastProcessedStats(connectionId: string, parsedStats: WebRTCStatsParsedWithNetworkScores): void;
+    protected getLastProcessedStats(connectionId: string): WebRTCStatsParsedWithNetworkScores | undefined;
+    protected getAllLastProcessedStats(connectionId: string): WebRTCStatsParsedWithNetworkScores[];
+    protected deleteLastProcessedStats(connectionId: string): void;
+}
+export default BaseIssueDetector;

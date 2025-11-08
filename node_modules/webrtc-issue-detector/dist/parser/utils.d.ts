@@ -1,0 +1,7 @@
+interface WithTS {
+    timestamp: number;
+}
+export declare const checkIsConnectionClosed: (pc: RTCPeerConnection) => boolean;
+export declare const calcValueRate: <T extends WithTS>(stats: T, prevStats: T | undefined, statPropName: keyof T) => number;
+export declare const calcBitrate: <T extends WithTS>(stats: T, prevStats: T | undefined, statPropName: keyof T) => number;
+export {};

@@ -1,0 +1,7 @@
+import { IssueDetectorResult, WebRTCStatsParsed } from '../types';
+import BaseIssueDetector from './BaseIssueDetector';
+declare class QualityLimitationsIssueDetector extends BaseIssueDetector {
+    performDetection(data: WebRTCStatsParsed): IssueDetectorResult;
+    private processData;
+}
+export default QualityLimitationsIssueDetector;

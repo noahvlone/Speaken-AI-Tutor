@@ -1,0 +1,18 @@
+import { IssueDetectorResult, WebRTCStatsParsed } from '../types';
+import BaseIssueDetector from './BaseIssueDetector';
+interface MissingStreamDetectorParams {
+    timeoutMs?: number;
+    steps?: number;
+}
+export default class MissingStreamDataDetector extends BaseIssueDetector {
+    #private;
+    constructor(params?: MissingStreamDetectorParams);
+    performDetection(data: WebRTCStatsParsed): IssueDetectorResult;
+    private processData;
+    private detectMissingData;
+    private static mapStatsByTrackId;
+    private static isAllBytesReceivedDidntChange;
+    private markIssue;
+    private removeMarkedIssue;
+}
+export {};

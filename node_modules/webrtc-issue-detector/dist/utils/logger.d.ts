@@ -1,0 +1,3 @@
+import { Logger } from '../types';
+declare const createLogger: () => Logger;
+export default createLogger;

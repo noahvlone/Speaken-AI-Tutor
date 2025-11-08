@@ -1,0 +1,6 @@
+import type { TokenSourceResponse } from '@livekit/protocol';
+import type { TokenPayload } from './types';
+export declare function isResponseTokenValid(response: TokenSourceResponse): boolean;
+/** Given a LiveKit generated participant token, decodes and returns the associated {@link TokenPayload} data. */
+export declare function decodeTokenPayload(token: string): TokenPayload;
+//# sourceMappingURL=utils.d.ts.map

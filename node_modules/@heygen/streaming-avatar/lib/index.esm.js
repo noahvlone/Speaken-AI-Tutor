@@ -1,0 +1,1277 @@
+import { ConnectionQuality as ConnectionQuality$1, ParticipantEvent, RoomEvent, ConnectionState, createLocalAudioTrack, Track, Room, VideoPresets } from 'livekit-client';
+import protobuf from 'protobufjs';
+
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+var options = {
+	syntax: "proto3"
+};
+var nested = {
+	pipecat: {
+		nested: {
+			TextFrame: {
+				fields: {
+					id: {
+						type: "uint64",
+						id: 1
+					},
+					name: {
+						type: "string",
+						id: 2
+					},
+					text: {
+						type: "string",
+						id: 3
+					}
+				}
+			},
+			AudioRawFrame: {
+				fields: {
+					id: {
+						type: "uint64",
+						id: 1
+					},
+					name: {
+						type: "string",
+						id: 2
+					},
+					audio: {
+						type: "bytes",
+						id: 3
+					},
+					sampleRate: {
+						type: "uint32",
+						id: 4
+					},
+					numChannels: {
+						type: "uint32",
+						id: 5
+					}
+				}
+			},
+			TranscriptionFrame: {
+				fields: {
+					id: {
+						type: "uint64",
+						id: 1
+					},
+					name: {
+						type: "string",
+						id: 2
+					},
+					text: {
+						type: "string",
+						id: 3
+					},
+					userId: {
+						type: "string",
+						id: 4
+					},
+					timestamp: {
+						type: "string",
+						id: 5
+					}
+				}
+			},
+			Frame: {
+				oneofs: {
+					frame: {
+						oneof: [
+							"text",
+							"audio",
+							"transcription"
+						]
+					}
+				},
+				fields: {
+					text: {
+						type: "TextFrame",
+						id: 1
+					},
+					audio: {
+						type: "AudioRawFrame",
+						id: 2
+					},
+					transcription: {
+						type: "TranscriptionFrame",
+						id: 3
+					}
+				}
+			}
+		}
+	}
+};
+var jsonDescriptor = {
+	options: options,
+	nested: nested
+};
+
+var ConnectionQuality;
+(function (ConnectionQuality) {
+    ConnectionQuality["UNKNOWN"] = "UNKNOWN";
+    ConnectionQuality["GOOD"] = "GOOD";
+    ConnectionQuality["BAD"] = "BAD";
+})(ConnectionQuality || (ConnectionQuality = {}));
+var AbstractConnectionQualityIndicator = /** @class */ (function () {
+    function AbstractConnectionQualityIndicator(onConnectionQualityChanged) {
+        this._connectionQuality = ConnectionQuality.UNKNOWN;
+        this.onConnectionQualityChanged = onConnectionQualityChanged;
+    }
+    Object.defineProperty(AbstractConnectionQualityIndicator.prototype, "connectionQuality", {
+        get: function () {
+            return this._connectionQuality;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    AbstractConnectionQualityIndicator.prototype.handleStatsChanged = function () {
+        var newConnectionQuality = this.calculateConnectionQuality();
+        if (newConnectionQuality !== this._connectionQuality) {
+            this._connectionQuality = newConnectionQuality;
+            this.onConnectionQualityChanged(newConnectionQuality);
+        }
+    };
+    AbstractConnectionQualityIndicator.prototype.start = function (params) {
+        this.stop(true);
+        this._start(params);
+    };
+    AbstractConnectionQualityIndicator.prototype.stop = function (muted) {
+        if (muted === void 0) { muted = false; }
+        this._stop();
+        this._connectionQuality = ConnectionQuality.UNKNOWN;
+        if (!muted) {
+            this.onConnectionQualityChanged(ConnectionQuality.UNKNOWN);
+        }
+    };
+    return AbstractConnectionQualityIndicator;
+}());
+function QualityIndicatorMixer() {
+    var configs = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        configs[_i] = arguments[_i];
+    }
+    var CombinedQualityIndicator = /** @class */ (function (_super) {
+        __extends(CombinedQualityIndicator, _super);
+        function CombinedQualityIndicator(onConnectionQualityChanged) {
+            var _this = _super.call(this, onConnectionQualityChanged) || this;
+            _this.childTrackers = configs.map(function (_a) {
+                var getParams = _a.getParams, TrackerClass = _a.TrackerClass;
+                return ({
+                    tracker: new TrackerClass(function () { return _this.handleStatsChanged(); }),
+                    getParams: getParams,
+                });
+            });
+            return _this;
+        }
+        CombinedQualityIndicator.prototype.calculateConnectionQuality = function () {
+            var connectionQualities = this.childTrackers.map(function (_a) {
+                var tracker = _a.tracker;
+                return tracker.connectionQuality;
+            });
+            if (connectionQualities.some(function (quality) { return quality === ConnectionQuality.BAD; })) {
+                return ConnectionQuality.BAD;
+            }
+            if (connectionQualities.every(function (quality) { return quality === ConnectionQuality.UNKNOWN; })) {
+                return ConnectionQuality.UNKNOWN;
+            }
+            return ConnectionQuality.GOOD;
+        };
+        CombinedQualityIndicator.prototype._start = function (params) {
+            this.childTrackers.forEach(function (_a) {
+                var tracker = _a.tracker, getParams = _a.getParams;
+                return tracker.start(getParams(params));
+            });
+        };
+        CombinedQualityIndicator.prototype._stop = function () {
+            this.childTrackers.forEach(function (_a) {
+                var tracker = _a.tracker;
+                return tracker.stop(true);
+            });
+        };
+        return CombinedQualityIndicator;
+    }(AbstractConnectionQualityIndicator));
+    return CombinedQualityIndicator;
+}
+
+var LiveKitConnectionQualityIndicator = /** @class */ (function (_super) {
+    __extends(LiveKitConnectionQualityIndicator, _super);
+    function LiveKitConnectionQualityIndicator() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.room = null;
+        _this.liveKitConnectionQuality = ConnectionQuality$1.Unknown;
+        _this.liveKitConnectionState = null;
+        _this.handleConnectionQualityChanged = function (quality) {
+            _this.liveKitConnectionQuality = quality;
+            _this.handleStatsChanged();
+        };
+        _this.handleConnectionStateChanged = function (state) {
+            _this.liveKitConnectionState = state;
+            _this.handleStatsChanged();
+        };
+        return _this;
+    }
+    LiveKitConnectionQualityIndicator.prototype._start = function (room) {
+        this.room = room;
+        this.room.localParticipant.on(ParticipantEvent.ConnectionQualityChanged, this.handleConnectionQualityChanged);
+        this.room.on(RoomEvent.ConnectionStateChanged, this.handleConnectionStateChanged);
+    };
+    LiveKitConnectionQualityIndicator.prototype._stop = function () {
+        if (this.room) {
+            this.room.localParticipant.off(RoomEvent.ConnectionQualityChanged, this.handleConnectionQualityChanged);
+            this.room.off(RoomEvent.ConnectionStateChanged, this.handleConnectionStateChanged);
+        }
+    };
+    LiveKitConnectionQualityIndicator.prototype.calculateConnectionQuality = function () {
+        if ([ConnectionQuality$1.Lost, ConnectionQuality$1.Poor].includes(this.liveKitConnectionQuality)) {
+            return ConnectionQuality.BAD;
+        }
+        if (this.liveKitConnectionState &&
+            [
+                ConnectionState.Disconnected,
+                ConnectionState.Reconnecting,
+                ConnectionState.SignalReconnecting,
+            ].includes(this.liveKitConnectionState)) {
+            return ConnectionQuality.BAD;
+        }
+        return ConnectionQuality.GOOD;
+    };
+    return LiveKitConnectionQualityIndicator;
+}(AbstractConnectionQualityIndicator));
+
+var t,e,s,n;function r(){}function o(){o.init.call(this);}function i(t){return void 0===t._maxListeners?o.defaultMaxListeners:t._maxListeners}function a(t,e,s){if(e)t.call(s);else for(var n=t.length,r=m(t,n),o=0;o<n;++o)r[o].call(s);}function c(t,e,s,n){if(e)t.call(s,n);else for(var r=t.length,o=m(t,r),i=0;i<r;++i)o[i].call(s,n);}function d(t,e,s,n,r){if(e)t.call(s,n,r);else for(var o=t.length,i=m(t,o),a=0;a<o;++a)i[a].call(s,n,r);}function u(t,e,s,n,r,o){if(e)t.call(s,n,r,o);else for(var i=t.length,a=m(t,i),c=0;c<i;++c)a[c].call(s,n,r,o);}function h(t,e,s,n){if(e)t.apply(s,n);else for(var r=t.length,o=m(t,r),i=0;i<r;++i)o[i].apply(s,n);}function l(t,e,s,n){var o,a,c,d;if("function"!=typeof s)throw new TypeError('"listener" argument must be a function');if((a=t._events)?(a.newListener&&(t.emit("newListener",e,s.listener?s.listener:s),a=t._events),c=a[e]):(a=t._events=new r,t._eventsCount=0),c){if("function"==typeof c?c=a[e]=n?[s,c]:[c,s]:n?c.unshift(s):c.push(s),!c.warned&&(o=i(t))&&o>0&&c.length>o){c.warned=!0;var u=new Error("Possible EventEmitter memory leak detected. "+c.length+" "+e+" listeners added. Use emitter.setMaxListeners() to increase limit");u.name="MaxListenersExceededWarning",u.emitter=t,u.type=e,u.count=c.length,d=u,"function"==typeof console.warn?console.warn(d):console.log(d);}}else c=a[e]=s,++t._eventsCount;return t}function p(t,e,s){var n=!1;function r(){t.removeListener(e,r),n||(n=!0,s.apply(t,arguments));}return r.listener=s,r}function f(t){var e=this._events;if(e){var s=e[t];if("function"==typeof s)return 1;if(s)return s.length}return 0}function m(t,e){for(var s=new Array(e);e--;)s[e]=t[e];return s}r.prototype=Object.create(null),o.EventEmitter=o,o.usingDomains=!1,o.prototype.domain=void 0,o.prototype._events=void 0,o.prototype._maxListeners=void 0,o.defaultMaxListeners=10,o.init=function(){this.domain=null,o.usingDomains&&undefined.active,this._events&&this._events!==Object.getPrototypeOf(this)._events||(this._events=new r,this._eventsCount=0),this._maxListeners=this._maxListeners||void 0;},o.prototype.setMaxListeners=function(t){if("number"!=typeof t||t<0||isNaN(t))throw new TypeError('"n" argument must be a positive number');return this._maxListeners=t,this},o.prototype.getMaxListeners=function(){return i(this)},o.prototype.emit=function(t){var e,s,n,r,o,i,l,p="error"===t;if(i=this._events)p=p&&null==i.error;else if(!p)return !1;if(l=this.domain,p){if(e=arguments[1],!l){if(e instanceof Error)throw e;var f=new Error('Uncaught, unspecified "error" event. ('+e+")");throw f.context=e,f}return e||(e=new Error('Uncaught, unspecified "error" event')),e.domainEmitter=this,e.domain=l,e.domainThrown=!1,l.emit("error",e),!1}if(!(s=i[t]))return !1;var m="function"==typeof s;switch(n=arguments.length){case 1:a(s,m,this);break;case 2:c(s,m,this,arguments[1]);break;case 3:d(s,m,this,arguments[1],arguments[2]);break;case 4:u(s,m,this,arguments[1],arguments[2],arguments[3]);break;default:for(r=new Array(n-1),o=1;o<n;o++)r[o-1]=arguments[o];h(s,m,this,r);}return !0},o.prototype.addListener=function(t,e){return l(this,t,e,!1)},o.prototype.on=o.prototype.addListener,o.prototype.prependListener=function(t,e){return l(this,t,e,!0)},o.prototype.once=function(t,e){if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');return this.on(t,p(this,t,e)),this},o.prototype.prependOnceListener=function(t,e){if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');return this.prependListener(t,p(this,t,e)),this},o.prototype.removeListener=function(t,e){var s,n,o,i,a;if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');if(!(n=this._events))return this;if(!(s=n[t]))return this;if(s===e||s.listener&&s.listener===e)0==--this._eventsCount?this._events=new r:(delete n[t],n.removeListener&&this.emit("removeListener",t,s.listener||e));else if("function"!=typeof s){for(o=-1,i=s.length;i-- >0;)if(s[i]===e||s[i].listener&&s[i].listener===e){a=s[i].listener,o=i;break}if(o<0)return this;if(1===s.length){if(s[0]=void 0,0==--this._eventsCount)return this._events=new r,this;delete n[t];}else !function(t,e){for(var s=e,n=s+1,r=t.length;n<r;s+=1,n+=1)t[s]=t[n];t.pop();}(s,o);n.removeListener&&this.emit("removeListener",t,a||e);}return this},o.prototype.off=function(t,e){return this.removeListener(t,e)},o.prototype.removeAllListeners=function(t){var e,s;if(!(s=this._events))return this;if(!s.removeListener)return 0===arguments.length?(this._events=new r,this._eventsCount=0):s[t]&&(0==--this._eventsCount?this._events=new r:delete s[t]),this;if(0===arguments.length){for(var n,o=Object.keys(s),i=0;i<o.length;++i)"removeListener"!==(n=o[i])&&this.removeAllListeners(n);return this.removeAllListeners("removeListener"),this._events=new r,this._eventsCount=0,this}if("function"==typeof(e=s[t]))this.removeListener(t,e);else if(e)do{this.removeListener(t,e[e.length-1]);}while(e[0]);return this},o.prototype.listeners=function(t){var e,s=this._events;return s&&(e=s[t])?"function"==typeof e?[e.listener||e]:function(t){for(var e=new Array(t.length),s=0;s<e.length;++s)e[s]=t[s].listener||t[s];return e}(e):[]},o.listenerCount=function(t,e){return "function"==typeof t.listenerCount?t.listenerCount(e):f.call(t,e)},o.prototype.listenerCount=f,o.prototype.eventNames=function(){return this._eventsCount>0?Reflect.ownKeys(this._events):[]};class g extends o{}!function(t){t.Issue="issue",t.NetworkScoresUpdated="network-scores-updated",t.StatsParsingFinished="stats-parsing-finished";}(t||(t={})),function(t){t.Network="network",t.CPU="cpu",t.Server="server",t.Stream="stream";}(e||(e={})),function(t){t.OutboundNetworkQuality="outbound-network-quality",t.InboundNetworkQuality="inbound-network-quality",t.OutboundNetworkMediaLatency="outbound-network-media-latency",t.InboundNetworkMediaLatency="inbound-network-media-latency",t.NetworkMediaSyncFailure="network-media-sync-failure",t.OutboundNetworkThroughput="outbound-network-throughput",t.InboundNetworkThroughput="inbound-network-throughput",t.EncoderCPUThrottling="encoder-cpu-throttling",t.DecoderCPUThrottling="decoder-cpu-throttling",t.ServerIssue="server-issue",t.UnknownVideoDecoderIssue="unknown-video-decoder",t.LowInboundMOS="low-inbound-mean-opinion-score",t.LowOutboundMOS="low-outbound-mean-opinion-score",t.FrozenVideoTrack="frozen-video-track",t.MissingVideoStreamData="missing-video-stream-data",t.MissingAudioStreamData="missing-audio-stream-data";}(s||(s={})),function(t){t[t.BAD=2.1]="BAD",t[t.POOR=2.6]="POOR",t[t.FAIR=3.1]="FAIR",t[t.GOOD=3.8]="GOOD",t[t.EXCELLENT=4.3]="EXCELLENT";}(n||(n={}));class S extends o{static STATS_REPORT_READY_EVENT="stats-report-ready";static STATS_REPORTS_PARSED="stats-reports-parsed";isStopped=!1;reportTimer;getStatsInterval;compositeStatsParser;constructor(t){super(),this.compositeStatsParser=t.compositeStatsParser,this.getStatsInterval=t.getStatsInterval??1e4;}get isRunning(){return !!this.reportTimer&&!this.isStopped}startReporting(){if(this.reportTimer)return;const t=()=>setTimeout((()=>{this.isStopped?this.reportTimer=void 0:this.parseReports().finally((()=>{this.reportTimer=t();}));}),this.getStatsInterval);this.isStopped=!1,this.reportTimer=t();}stopReporting(){this.isStopped=!0,this.reportTimer&&(clearTimeout(this.reportTimer),this.reportTimer=void 0);}async parseReports(){const t=Date.now(),e=await this.compositeStatsParser.parse(),s=Date.now()-t;this.emit(S.STATS_REPORTS_PARSED,{timeTaken:s,reportItems:e}),e.forEach((t=>{this.emit(S.STATS_REPORT_READY_EVENT,t);}));}}const v=(()=>{const t=new Map;return e=>{const{taskId:s,delayMs:n,maxJitterMs:r,callback:o}=e,i=Math.ceil(Math.random()*(r||0)),a=t.get(s);a&&clearTimeout(a);const c=setTimeout((()=>{o(),t.delete(s);}),n+i);t.set(s,c);}})();class k{#t={};calculate(t){const{connection:{id:e}}=t,{mos:s,stats:n}=this.calculateOutboundScore(t)||{},{mos:r,stats:o}=this.calculateInboundScore(t)||{};return this.#t[e]=t,v({taskId:e,delayMs:35e3,callback:()=>delete this.#t[e]}),{outbound:s,inbound:r,connectionId:e,statsSamples:{inboundStatsSample:o,outboundStatsSample:n}}}calculateOutboundScore(t){const e=[...t.remote?.audio.inbound||[],...t.remote?.video.inbound||[]];if(!e.length)return;const s=this.#t[t.connection.id];if(!s)return;const n=[...s.remote?.audio.inbound||[],...s.remote?.video.inbound||[]],{packetsSent:r}=t.connection,o=s.connection.packetsSent,i=e.reduce(((t,e)=>{const s=n.find((t=>t.ssrc===e.ssrc));return {sumJitter:t.sumJitter+e.jitter,packetsLost:t.packetsLost+e.packetsLost,lastPacketsLost:t.lastPacketsLost+(s?.packetsLost||0)}}),{sumJitter:0,packetsLost:0,lastPacketsLost:0}),a=1e3*t.connection.currentRoundTripTime||0,{sumJitter:c}=i,d=c/e.length,u=r-o,h=i.packetsLost-i.lastPacketsLost,l=u&&h?Math.round(100*h/(u+h)):0;return {mos:this.calculateMOS({avgJitter:d,rtt:a,packetsLoss:l}),stats:{avgJitter:d,rtt:a,packetsLoss:l}}}calculateInboundScore(t){const e=[...t.audio?.inbound,...t.video?.inbound];if(!e.length)return;const s=this.#t[t.connection.id];if(!s)return;const n=[...s.video?.inbound,...s.audio?.inbound],{packetsReceived:r}=t.connection,o=s.connection.packetsReceived,i=e.reduce(((t,e)=>{const s=n.find((t=>t.ssrc===e.ssrc));return {sumJitter:t.sumJitter+e.jitter,packetsLost:t.packetsLost+e.packetsLost,lastPacketsLost:t.lastPacketsLost+(s?.packetsLost||0)}}),{sumJitter:0,packetsLost:0,lastPacketsLost:0}),a=1e3*t.connection.currentRoundTripTime||0,{sumJitter:c}=i,d=c/e.length,u=r-o,h=i.packetsLost-i.lastPacketsLost,l=u&&h?Math.round(100*h/(u+h)):0;return {mos:this.calculateMOS({avgJitter:d,rtt:a,packetsLoss:l}),stats:{avgJitter:d,rtt:a,packetsLoss:l}}}calculateMOS({avgJitter:t,rtt:e,packetsLoss:s}){const n=e+2*t+10;let r=n<160?93.2-n/40:93.2-n/120-10;return r-=2.5*s,1+.035*r+7e-6*r*(r-60)*(100-r)}}class y{#e=new Map;#s;#n;constructor(t={}){this.#s=t.statsCleanupTtlMs??35e3,this.#n=t.maxParsedStatsStorageSize??5;}detect(t,e){const s={...t,networkScores:{...e,statsSamples:e?.statsSamples||{}}},n=this.performDetection(s);return this.setLastProcessedStats(t.connection.id,s),this.performPrevStatsCleanup({connectionId:t.connection.id}),n}performPrevStatsCleanup(t){const{connectionId:e,cleanupCallback:s}=t;this.#e.has(e)&&v({taskId:e,delayMs:this.#s,callback:()=>{this.deleteLastProcessedStats(e),"function"==typeof s&&s();}});}setLastProcessedStats(t,e){if(!t||e.connection.id!==t)return;const s=this.#e.get(t)??[];s.push(e),s.length>this.#n&&s.shift(),this.#e.set(t,s);}getLastProcessedStats(t){const e=this.#e.get(t);return e?.[e.length-1]}getAllLastProcessedStats(t){return this.#e.get(t)??[]}deleteLastProcessedStats(t){this.#e.delete(t);}}class w extends y{#r;constructor(t={}){super(t),this.#r=t.availableOutgoingBitrateThreshold??1e5;}performDetection(t){const n=[],{availableOutgoingBitrate:r}=t.connection;if(void 0===r)return n;const o=t.audio.outbound.reduce(((t,e)=>t+e.targetBitrate),0),i=t.video.outbound.reduce(((t,e)=>t+e.bitrate),0);if(!o&&!i)return n;const a={availableOutgoingBitrate:r,videoStreamsTotalBitrate:i,audioStreamsTotalTargetBitrate:o};return o>r||i>0&&r<this.#r?(n.push({statsSample:a,type:e.Network,reason:s.OutboundNetworkThroughput}),n):n}}class b extends y{#o;#i;#a;#c;constructor(t={}){super(),this.#o=t.highPacketLossThresholdPct??5,this.#i=t.highJitterThreshold??200,this.#a=t.highJitterBufferDelayThresholdMs??500,this.#c=t.highRttThresholdMs??250;}performDetection(t){return this.processData(t)}processData(t){const n=[],r=[...t.audio?.inbound,...t.video?.inbound];if(!r.length)return n;const o=this.getLastProcessedStats(t.connection.id);if(!o)return n;const i=[...o.video?.inbound,...o.audio?.inbound],{packetsReceived:a}=t.connection,c=o.connection.packetsReceived,d=r.reduce(((t,e)=>{const s=i.find((t=>t.ssrc===e.ssrc)),n=s?.jitterBufferDelay||0,r=s?.jitterBufferEmittedCount||0,o=e.jitterBufferDelay-n,a=e.jitterBufferEmittedCount-r,c=o&&a?1e3*o/a:0;return {sumJitter:t.sumJitter+e.jitter,sumJitterBufferDelayMs:t.sumJitterBufferDelayMs+c,packetsLost:t.packetsLost+e.packetsLost,lastPacketsLost:t.lastPacketsLost+(s?.packetsLost||0)}}),{sumJitter:0,sumJitterBufferDelayMs:0,packetsLost:0,lastPacketsLost:0}),u=1e3*t.connection.currentRoundTripTime||0,{sumJitter:h,sumJitterBufferDelayMs:l}=d,p=h/r.length,f=l/r.length,m=a-c,g=d.packetsLost-d.lastPacketsLost,S=m&&g?Math.round(100*g/(m+g)):0,v=S>this.#o,k=p>=this.#i,y=u>=this.#c,w=f>this.#a,b=y&&!k&&!v,P=v&&k,T=k&&w,L={rtt:u,packetLossPct:S,avgJitter:p,avgJitterBufferDelay:f};return (k||v)&&n.push({statsSample:L,type:e.Network,reason:s.InboundNetworkQuality,iceCandidate:t.connection.local.id}),b&&n.push({statsSample:L,type:e.Server,reason:s.ServerIssue,iceCandidate:t.connection.remote.id}),P&&n.push({statsSample:L,type:e.Network,reason:s.InboundNetworkMediaLatency,iceCandidate:t.connection.local.id}),T&&n.push({statsSample:L,type:e.Network,reason:s.NetworkMediaSyncFailure,iceCandidate:t.connection.local.id}),n}}class P extends y{#d;constructor(t={}){super(),this.#d=t.correctedSamplesThresholdPct??5;}performDetection(t){return this.processData(t)}processData(t){const n=t.audio.inbound,r=[],o=this.getLastProcessedStats(t.connection.id)?.audio.inbound;return o?(n.forEach((t=>{const n=o.find((e=>e.ssrc===t.ssrc));if(!n)return;const i=t.track.insertedSamplesForDeceleration+t.track.removedSamplesForAcceleration,a=n.track.insertedSamplesForDeceleration+n.track.removedSamplesForAcceleration;if(i===a)return;const c=t.track.totalSamplesReceived-n.track.totalSamplesReceived,d=i-a,u=Math.round(100*d/c),h={correctedSamplesPct:u};u>this.#d&&r.push({statsSample:h,type:e.Network,reason:s.NetworkMediaSyncFailure,ssrc:t.ssrc});})),r):r}}class T extends y{#o;#i;constructor(t={}){super(),this.#o=t.highPacketLossThresholdPct??5,this.#i=t.highJitterThreshold??200;}performDetection(t){return this.processData(t)}processData(t){const n=[],r=[...t.remote?.audio.inbound||[],...t.remote?.video.inbound||[]];if(!r.length)return n;const o=this.getLastProcessedStats(t.connection.id);if(!o)return n;const i=[...o.remote?.audio.inbound||[],...o.remote?.video.inbound||[]],{packetsSent:a}=t.connection,c=o.connection.packetsSent,d=r.reduce(((t,e)=>{const s=i.find((t=>t.ssrc===e.ssrc));return {sumJitter:t.sumJitter+e.jitter,packetsLost:t.packetsLost+e.packetsLost,lastPacketsLost:t.lastPacketsLost+(s?.packetsLost||0)}}),{sumJitter:0,packetsLost:0,lastPacketsLost:0}),u=1e3*t.connection.currentRoundTripTime||0,{sumJitter:h}=d,l=h/r.length,p=a-c,f=d.packetsLost-d.lastPacketsLost,m=p&&f?Math.round(100*f/(p+f)):0,g=m>this.#o,S=l>=this.#i,v=!g&&S||S||g,k={rtt:u,avgJitter:l,packetLossPct:m};return g&&S&&n.push({statsSample:k,type:e.Network,reason:s.OutboundNetworkMediaLatency,iceCandidate:t.connection.local.id}),v&&n.push({statsSample:k,type:e.Network,reason:s.OutboundNetworkQuality,iceCandidate:t.connection.local.id}),n}}class L extends y{performDetection(t){return this.processData(t)}processData(t){const n=t.video.outbound.filter((t=>"none"!==t.qualityLimitationReason)),r=[],o=this.getLastProcessedStats(t.connection.id)?.video.outbound;return o?(n.forEach((t=>{const n=o.find((e=>e.ssrc===t.ssrc));if(!n)return;const i={qualityLimitationReason:t.qualityLimitationReason};t.framesSent>n.framesSent||("cpu"===t.qualityLimitationReason&&r.push({statsSample:i,type:e.CPU,reason:s.EncoderCPUThrottling,ssrc:t.ssrc}),"bandwidth"===t.qualityLimitationReason&&r.push({statsSample:i,type:e.Network,reason:s.OutboundNetworkThroughput,ssrc:t.ssrc}));})),r):r}}class D extends y{UNKNOWN_DECODER="unknown";#u={};performDetection(t){return this.processData(t)}performPrevStatsCleanup(t){const{connectionId:e,cleanupCallback:s}=t;super.performPrevStatsCleanup({...t,cleanupCallback:()=>{delete this.#u[e],"function"==typeof s&&s();}});}processData(t){const n=[],{id:r}=t.connection,o=this.getLastProcessedStats(r)?.video.inbound;return t.video.inbound.forEach((t=>{const{decoderImplementation:i,ssrc:a}=t,c=o?.find((t=>t.ssrc===a));if(c)if(i===this.UNKNOWN_DECODER){if(!this.hadLastDecoderWithIssue(r,a)){this.setLastDecoderWithIssue(r,a,this.UNKNOWN_DECODER);const o={mimeType:t.mimeType,decoderImplementation:i};n.push({ssrc:a,statsSample:o,type:e.Stream,reason:s.UnknownVideoDecoderIssue,trackIdentifier:t.track.trackIdentifier});}}else this.setLastDecoderWithIssue(r,a,void 0);})),n}setLastDecoderWithIssue(t,e,s){const n=this.#u[t]??{};void 0===s?delete n[e]:n[e]=s,this.#u[t]=n;}hadLastDecoderWithIssue(t,e){const s=this.#u[t];return (s&&s[e])===this.UNKNOWN_DECODER}}const C=t=>t.reduce(((t,e)=>t+e),0)/t.length,R=(t,e,s=30)=>{const n=[];for(let s=1;s<e.length-1;s+=1){const r=e[s]?.video?.inbound.find((e=>e.ssrc===t));if(!r)continue;const o=e[s-1]?.video?.inbound?.find((e=>e.ssrc===t));if(!r||!o)continue;const i=r.timestamp-o.timestamp,a=r.framesDecoded-o.framesDecoded;if(a>0){const t=i/a;n.push(t);}}if(n.length<=1)return !1;return (t=>{const e=((t,e)=>e.reduce(((e,s)=>e+(s-t)**2),0)/e.length)(C(t),t);return Math.sqrt(e)})(n)>s},M=(t,e)=>{for(let s=1;s<e.length;s+=1){const n=e[s].video.inbound.find((e=>e.ssrc===t));if(!n)continue;const r=e[s-1].video.inbound.find((e=>e.ssrc===t)),o=n.frameWidth!==r?.frameWidth,i=n.frameHeight!==r?.frameHeight;if(o||i)return !0}return !1};class I extends y{#h;#l;#p;constructor(t={}){super(),this.#h=t.avgFreezeDurationThresholdMs??1e3,this.#l=t.frozenDurationThresholdPct??30,this.#p=t.minMosQuality??n.BAD;}performDetection(t){const e=t.networkScores.inbound;return void 0!==e&&e<=this.#p?[]:this.processData(t)}processData(t){const n=[],r=this.getAllLastProcessedStats(t.connection.id);if(0===r.length)return [];const o=t.video.inbound.map((e=>{const s=r[r.length-1].video.inbound.find((t=>t.ssrc===e.ssrc));if(!s)return;if(M(e.ssrc,[r[r.length-1],t]))return;if(R(e.ssrc,r))return;const n=e.freezeCount-(s.freezeCount??0),o=1e3*(e.totalFreezesDuration-(s.totalFreezesDuration??0)),i=n>0?o/n:0,a=o/(e.timestamp-s.timestamp)*100;return a>this.#l||i>this.#h?{ssrc:e.ssrc,avgFreezeDurationMs:i,frozenDurationPct:a}:void 0})).filter((t=>void 0!==t));return o.length>0&&(n.push({type:e.Stream,reason:s.FrozenVideoTrack,statsSample:{ssrcs:o.map((t=>t.ssrc))}}),this.deleteLastProcessedStats(t.connection.id)),n}}class E extends y{#f;#m;#p;constructor(t={}){super(t),this.#f=t.volatilityThreshold??8,this.#m=t.affectedStreamsPercentThreshold??30,this.#p=t.minMosQuality??n.BAD;}performDetection(t){return [...this.getAllLastProcessedStats(t.connection.id),t].find((t=>void 0!==t.networkScores.inbound&&t.networkScores.inbound<=this.#p))?[]:this.processData(t)}processData(t){const n=[],r=[...this.getAllLastProcessedStats(t.connection.id),t],o=t.video.inbound.map((t=>{if(r.length<5)return;if(M(t.ssrc,r))return;const e=[];for(let s=0;s<r.length-1;s+=1){const n=r[s].video.inbound.find((e=>e.ssrc===t.ssrc));void 0!==n?.framesPerSecond&&e.push(n.framesPerSecond);}if(e.length<5)return;if(R(t.ssrc,r))return;const s=(t=>{if(0===t.length)throw new Error("Cannot calculate volatility for empty array");const e=C(t);return t.reduce(((t,s)=>t+Math.abs(s-e)),0)/t.length*100/e})(e);return s>this.#f?{ssrc:t.ssrc,allFps:e,volatility:s}:void 0})).filter((t=>Boolean(t)));if(0===o.length)return n;const i=o.length/(t.video.inbound.length/100);return i>this.#m&&(n.push({type:e.CPU,reason:s.DecoderCPUThrottling,statsSample:{affectedStreamsPercent:i,throtthedStreams:o}}),this.deleteLastProcessedStats(t.connection.id)),n}}const N=t=>"closed"===t.iceConnectionState||"closed"===t.connectionState,_=(t,e,s)=>8*((t,e,s)=>{if(!e)return 0;const n=t[s],r=e[s];if(null==n||null==r)return 0;const o=Math.floor(t.timestamp)-Math.floor(e.timestamp);return 0===o?0:(Number(n)-Number(r))/o*1e3})(t,e,s);class A{connections=[];statsParser;constructor(t){this.statsParser=t.statsParser;}listConnections(){return [...this.connections]}addPeerConnection(t){this.connections.push({id:t.id??String(Date.now()+Math.random().toString(32)),pc:t.pc});}removePeerConnection(t){const e=this.connections.findIndex((({pc:e})=>e===t.pc));e>=0&&this.removeConnectionsByIndexes([e]);}async parse(){const t=[],e=this.connections.map((async(e,s)=>{if(!N(e.pc))return this.statsParser.parse(e);t.unshift(s);}));t.length&&this.removeConnectionsByIndexes(t);return (await Promise.all(e)).filter((t=>void 0!==t))}removeConnectionsByIndexes(t){t.forEach((t=>{this.connections.splice(t,1);}));}}class O{prevStats=new Map;allowedReportTypes=new Set(["candidate-pair","inbound-rtp","outbound-rtp","remote-outbound-rtp","remote-inbound-rtp","track","transport"]);ignoreSSRCList;logger;constructor(t){this.ignoreSSRCList=t.ignoreSSRCList??[],this.logger=t.logger;}get previouslyParsedStatsConnectionsIds(){return [...this.prevStats.keys()]}async parse(t){if(!N(t.pc))return this.getConnectionStats(t);this.logger.debug("Skip stats parsing. Connection is closed.",{connection:t});}async getConnectionStats(t){const{pc:e,id:s}=t;try{const n=Date.now(),r=e.getReceivers().filter((t=>t.track?.enabled)),o=e.getSenders().filter((t=>t.track?.enabled)),i=await Promise.all(r.map((t=>t.getStats()))),a=await Promise.all(o.map((t=>t.getStats())));return {id:s,stats:this.mapReportsStats([...i,...a],t),timeTaken:Date.now()-n}}catch(t){return void this.logger.error("Failed to get stats for PC",{id:s,pc:e,error:t})}}mapReportsStats(t,e){const s={audio:{inbound:[],outbound:[]},video:{inbound:[],outbound:[]},connection:{},remote:{video:{inbound:[],outbound:[]},audio:{inbound:[],outbound:[]}}};t.forEach((t=>{t.forEach((e=>{this.allowedReportTypes.has(e.type)&&this.updateMappedStatsWithReportItemData(e,s,t);}));}));const{id:n}=e,r=this.prevStats.get(n);return r&&this.propagateStatsWithRateValues(s,r.stats),this.prevStats.set(n,{stats:s,ts:Date.now()}),v({taskId:n,delayMs:35e3,callback:()=>this.prevStats.delete(n)}),s}updateMappedStatsWithReportItemData(t,e,s){const n=t.type;if("candidate-pair"===n&&"succeeded"===t.state&&t.nominated)return void(e.connection=this.prepareConnectionStats(t,s));const r=this.getMediaType(t);if(!r)return;const o=t.ssrc;if(!o||!this.ignoreSSRCList.includes(o))if("outbound-rtp"!==n)if("inbound-rtp"!==n)"remote-outbound-rtp"!==n?"remote-inbound-rtp"===n&&(this.mapConnectionStatsIfNecessary(e,t,s),e.remote[r].inbound.push({...t})):e.remote[r].outbound.push({...t});else {const n=s.get(t.trackId)||s.get(t.mediaSourceId)||{};this.mapConnectionStatsIfNecessary(e,t,s);const o={...t,track:{...n}};e[r].inbound.push(o);}else {const n=s.get(t.trackId)||s.get(t.mediaSourceId)||{},o={...t,track:{...n}};e[r].outbound.push(o);}}getMediaType(t){const e=t.mediaType||t.kind;if(!["audio","video"].includes(e)){const{id:e}=t;if(!e)return;return String(e).includes("Video")?"video":String(e).includes("Audio")?"audio":void 0}return e}propagateStatsWithRateValues(t,e){t.audio.inbound.forEach((t=>{const s=e.audio.inbound.find((({id:e})=>e===t.id));t.bitrate=_(t,s,"bytesReceived"),t.packetRate=_(t,s,"packetsReceived");})),t.audio.outbound.forEach((t=>{const s=e.audio.outbound.find((({id:e})=>e===t.id));t.bitrate=_(t,s,"bytesSent"),t.packetRate=_(t,s,"packetsSent");})),t.video.inbound.forEach((t=>{const s=e.video.inbound.find((({id:e})=>e===t.id));t.bitrate=_(t,s,"bytesReceived"),t.packetRate=_(t,s,"packetsReceived");})),t.video.outbound.forEach((t=>{const s=e.video.outbound.find((({id:e})=>e===t.id));t.bitrate=_(t,s,"bytesSent"),t.packetRate=_(t,s,"packetsSent");}));}mapConnectionStatsIfNecessary(t,e,s){if(t.connection.id||!e.transportId)return;const n=s.get(e.transportId);if(n&&n.selectedCandidatePairId){const e=s.get(n.selectedCandidatePairId);t.connection=this.prepareConnectionStats(e,s);}}prepareConnectionStats(t,e){if(!t||!e)return {};const s={...t};if(s.remoteCandidateId){const t=e.get(s.remoteCandidateId);s.remote={...t};}if(s.localCandidateId){const t=e.get(s.localCandidateId);s.local={...t};}return s}}class J extends y{#g=new Map;#S;#v;constructor(t={}){super(),this.#S=t.timeoutMs??15e3,this.#v=t.steps??3;}performDetection(t){return this.processData(t)}processData(t){const n=[],r=[...this.getAllLastProcessedStats(t.connection.id),t];if(r.length<this.#v)return n;const o=r.slice(-this.#v),i=o.map((t=>t.video.inbound)),a=o.map((t=>t.audio.inbound));n.push(...this.detectMissingData(a,e.Stream,s.MissingAudioStreamData)),n.push(...this.detectMissingData(i,e.Stream,s.MissingVideoStreamData));return new Set(this.#g.keys()).forEach((t=>{const e=this.#g.get(t);e&&Date.now()-e>this.#S&&this.removeMarkedIssue(t);})),n}detectMissingData(t,e,s){const n=[],r=t.pop(),o=J.mapStatsByTrackId(t);return r.forEach((t=>{const r=t.track.trackIdentifier,i=o.get(r);if(!Array.isArray(i)||0===i.length)return;if(t.track.detached||t.track.ended)return;if(!J.isAllBytesReceivedDidntChange(t.bytesReceived,i))return void this.removeMarkedIssue(r);if(!this.markIssue(r))return;const a={bytesReceived:t.bytesReceived};n.push({type:e,reason:s,statsSample:a,trackIdentifier:r});})),n}static mapStatsByTrackId(t){const e=new Map;return t.forEach((t=>{t.forEach((t=>{const s=e.get(t.track.trackIdentifier)||[];s.push(t),e.set(t.track.trackIdentifier,s);}));})),e}static isAllBytesReceivedDidntChange(t,e){for(let s=0;s<e.length;s+=1){if(e[s].bytesReceived!==t)return !1}return !0}markIssue(t){const e=Date.now(),s=this.#g.get(t);return (!s||e-s>this.#S)&&(this.#g.set(t,e),!0)}removeMarkedIssue(t){this.#g.delete(t);}}class x{eventEmitter;#k=!1;detectors=[];networkScoresCalculator;statsReporter;compositeStatsParser;logger;autoAddPeerConnections;constructor(e){this.logger=e.logger??{debug:()=>{},info:()=>{},warn:()=>{},error:()=>{}},this.eventEmitter=e.issueEmitter??new g,e.onIssues&&this.eventEmitter.on(t.Issue,e.onIssues),e.onNetworkScoresUpdated&&this.eventEmitter.on(t.NetworkScoresUpdated,e.onNetworkScoresUpdated),this.detectors=e.detectors??[new L,new b,new T,new P,new w,new D,new I,new E,new J],this.networkScoresCalculator=e.networkScoresCalculator??new k,this.compositeStatsParser=e.compositeStatsParser??new A({statsParser:new O({ignoreSSRCList:e.ignoreSSRCList,logger:this.logger})}),this.statsReporter=e.statsReporter??new S({compositeStatsParser:this.compositeStatsParser,getStatsInterval:e.getStatsInterval??5e3}),window.wid=this,this.autoAddPeerConnections=e.autoAddPeerConnections??!0,this.autoAddPeerConnections&&this.wrapRTCPeerConnection(),this.statsReporter.on(S.STATS_REPORT_READY_EVENT,(t=>{const e=this.calculateNetworkScores(t.stats);this.detectIssues({data:t.stats},e);})),this.statsReporter.on(S.STATS_REPORTS_PARSED,(s=>{const n={timeTaken:s.timeTaken,ts:Date.now()};e.onStats&&e.onStats(s.reportItems),this.eventEmitter.emit(t.StatsParsingFinished,n);}));}watchNewPeerConnections(){if(!this.autoAddPeerConnections)throw new Error("Auto add peer connections was disabled in the constructor.");this.#k?this.logger.warn("WebRTCIssueDetector is already started. Skip processing"):(this.logger.info("Start watching peer connections"),this.#k=!0,this.statsReporter.startReporting());}stopWatchingNewPeerConnections(){this.#k?(this.logger.info("Stop watching peer connections"),this.#k=!1,this.statsReporter.stopReporting()):this.logger.warn("WebRTCIssueDetector is already stopped. Skip processing");}handleNewPeerConnection(t,e){this.#k||!this.autoAddPeerConnections?(this.#k||!1!==this.autoAddPeerConnections||(this.logger.info("Starting stats reporting for new peer connection"),this.#k=!0,this.statsReporter.startReporting()),this.logger.debug("Handling new peer connection",t),this.compositeStatsParser.addPeerConnection({pc:t,id:e})):this.logger.debug("Skip handling new peer connection. Detector is not running",t);}emitIssues(e){this.eventEmitter.emit(t.Issue,e);}detectIssues({data:t},e){const s=this.detectors.reduce(((s,n)=>[...s,...n.detect(t,e)]),[]);s.length>0&&this.emitIssues(s);}calculateNetworkScores(e){const s=this.networkScoresCalculator.calculate(e);return this.eventEmitter.emit(t.NetworkScoresUpdated,s),s}wrapRTCPeerConnection(){if(!window.RTCPeerConnection)return void this.logger.warn("No RTCPeerConnection found in browser window. Skipping");const t=window.RTCPeerConnection,e=t=>this.handleNewPeerConnection(t);function s(s){const n=new t(s);return e(n),n}s.prototype=t.prototype,window.RTCPeerConnection=s;}}
+
+var WebRTCConnectionQualityIndicator = /** @class */ (function (_super) {
+    __extends(WebRTCConnectionQualityIndicator, _super);
+    function WebRTCConnectionQualityIndicator() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.issueDetector = null;
+        _this.mosScores = null;
+        return _this;
+    }
+    WebRTCConnectionQualityIndicator.prototype._start = function (peerConnection) {
+        var _this = this;
+        this.issueDetector = new x({
+            autoAddPeerConnections: false,
+            getStatsInterval: 3000,
+            onNetworkScoresUpdated: function (scores) {
+                _this.mosScores = scores;
+                _this.handleStatsChanged();
+            },
+        });
+        this.issueDetector.handleNewPeerConnection(peerConnection);
+    };
+    WebRTCConnectionQualityIndicator.prototype._stop = function () {
+        if (this.issueDetector) {
+            this.issueDetector.stopWatchingNewPeerConnections();
+            this.issueDetector = null;
+        }
+        this.mosScores = null;
+    };
+    WebRTCConnectionQualityIndicator.prototype.calculateConnectionQuality = function () {
+        if (!this.mosScores || (this.mosScores.inbound && this.mosScores.outbound)) {
+            return ConnectionQuality.UNKNOWN;
+        }
+        if ((this.mosScores.inbound && this.mosScores.inbound < 3) ||
+            (this.mosScores.outbound && this.mosScores.outbound < 3)) {
+            return ConnectionQuality.BAD;
+        }
+        return ConnectionQuality.GOOD;
+    };
+    return WebRTCConnectionQualityIndicator;
+}(AbstractConnectionQualityIndicator));
+
+var VoiceChatState;
+(function (VoiceChatState) {
+    VoiceChatState["INACTIVE"] = "inactive";
+    VoiceChatState["STARTING"] = "starting";
+    VoiceChatState["ACTIVE"] = "started";
+    VoiceChatState["STOPPING"] = "stopping";
+})(VoiceChatState || (VoiceChatState = {}));
+var AbstractVoiceChat = /** @class */ (function () {
+    function AbstractVoiceChat() {
+    }
+    return AbstractVoiceChat;
+}());
+var AbstractVoiceChatImplementation = /** @class */ (function (_super) {
+    __extends(AbstractVoiceChatImplementation, _super);
+    function AbstractVoiceChatImplementation() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._isMuted = true;
+        _this.state = VoiceChatState.INACTIVE;
+        return _this;
+    }
+    Object.defineProperty(AbstractVoiceChatImplementation.prototype, "isMuted", {
+        get: function () {
+            return this._isMuted;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(AbstractVoiceChatImplementation.prototype, "isVoiceChatting", {
+        get: function () {
+            return this.state !== VoiceChatState.INACTIVE;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    AbstractVoiceChatImplementation.prototype.startVoiceChat = function (voiceChatConfig) {
+        return __awaiter(this, void 0, void 0, function () {
+            var e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(this.state !== VoiceChatState.INACTIVE)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.stopVoiceChat()];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 4, , 6]);
+                        this.state = VoiceChatState.STARTING;
+                        return [4 /*yield*/, this._startVoiceChat(voiceChatConfig)];
+                    case 3:
+                        _a.sent();
+                        this.state = VoiceChatState.ACTIVE;
+                        return [3 /*break*/, 6];
+                    case 4:
+                        e_1 = _a.sent();
+                        return [4 /*yield*/, this.stopVoiceChat()];
+                    case 5:
+                        _a.sent();
+                        throw e_1;
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AbstractVoiceChatImplementation.prototype.stopVoiceChat = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this.state === VoiceChatState.INACTIVE) {
+                            return [2 /*return*/];
+                        }
+                        this.state = VoiceChatState.STOPPING;
+                        return [4 /*yield*/, this._stopVoiceChat()];
+                    case 1:
+                        _a.sent();
+                        this._isMuted = true;
+                        this.state = VoiceChatState.INACTIVE;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AbstractVoiceChatImplementation.prototype._mute = function () {
+        return;
+    };
+    AbstractVoiceChatImplementation.prototype._unmute = function () {
+        return;
+    };
+    AbstractVoiceChatImplementation.prototype.mute = function () {
+        if (!this.isVoiceChatting) {
+            return;
+        }
+        this._mute();
+        this._isMuted = true;
+    };
+    AbstractVoiceChatImplementation.prototype.unmute = function () {
+        if (!this.isVoiceChatting) {
+            return;
+        }
+        this._unmute();
+        this._isMuted = false;
+    };
+    return AbstractVoiceChatImplementation;
+}(AbstractVoiceChat));
+
+function sleep(ms) {
+    return new Promise(function (resolve) { return setTimeout(resolve, ms); });
+}
+function convertFloat32ToS16PCM(float32Array) {
+    var int16Array = new Int16Array(float32Array.length);
+    for (var i = 0; i < float32Array.length; i++) {
+        var clampedValue = Math.max(-1, Math.min(1, float32Array[i]));
+        int16Array[i] = clampedValue < 0 ? clampedValue * 32768 : clampedValue * 32767;
+    }
+    return int16Array;
+}
+
+var LivekitVoiceChat = /** @class */ (function (_super) {
+    __extends(LivekitVoiceChat, _super);
+    function LivekitVoiceChat() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.room = null;
+        _this.track = null;
+        return _this;
+    }
+    LivekitVoiceChat.prototype._startVoiceChat = function (voiceChatConfig) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            var _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        this.room = voiceChatConfig.room;
+                        _a = this;
+                        return [4 /*yield*/, createLocalAudioTrack({
+                                echoCancellation: true,
+                                noiseSuppression: true,
+                                autoGainControl: true,
+                            })];
+                    case 1:
+                        _a.track = _c.sent();
+                        return [4 /*yield*/, this.room.localParticipant.publishTrack(this.track)];
+                    case 2:
+                        _c.sent();
+                        if (!((_b = voiceChatConfig.config) === null || _b === void 0 ? void 0 : _b.defaultMuted)) {
+                            this.unmute();
+                        }
+                        else {
+                            this.mute();
+                        }
+                        return [4 /*yield*/, sleep(4000)];
+                    case 3:
+                        _c.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    LivekitVoiceChat.prototype._stopVoiceChat = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                if ((_a = this.room) === null || _a === void 0 ? void 0 : _a.localParticipant) {
+                    this.room.localParticipant.getTrackPublications().forEach(function (publication) {
+                        if (publication.track && publication.track.kind === Track.Kind.Audio) {
+                            publication.track.stop();
+                        }
+                    });
+                }
+                if (this.track) {
+                    this.track.stop();
+                    this.track = null;
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
+    LivekitVoiceChat.prototype._mute = function () {
+        if (this.track && !this.track.isMuted) {
+            this.track.mute();
+        }
+    };
+    LivekitVoiceChat.prototype._unmute = function () {
+        if (this.track && this.track.isMuted) {
+            this.track.unmute();
+        }
+    };
+    return LivekitVoiceChat;
+}(AbstractVoiceChatImplementation));
+
+var WebSocketVoiceChat = /** @class */ (function (_super) {
+    __extends(WebSocketVoiceChat, _super);
+    function WebSocketVoiceChat() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.audioContext = null;
+        _this.webSocket = null;
+        _this.scriptProcessor = null;
+        _this.mediaStreamAudioSource = null;
+        _this.mediaDevicesStream = null;
+        _this.audioRawFrame = null;
+        return _this;
+    }
+    WebSocketVoiceChat.prototype._startVoiceChat = function (voiceChatConfig) {
+        return __awaiter(this, void 0, void 0, function () {
+            var devicesStream;
+            var _this = this;
+            var _a, _b, _c, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                            throw new Error('Cannot start voice chat without media devices');
+                        }
+                        this.webSocket = voiceChatConfig.webSocket;
+                        this.audioRawFrame = voiceChatConfig.audioRawFrame;
+                        this.audioContext = new window.AudioContext({
+                            latencyHint: 'interactive',
+                            sampleRate: 16000,
+                        });
+                        if (!((_a = voiceChatConfig.config) === null || _a === void 0 ? void 0 : _a.defaultMuted)) {
+                            this.unmute();
+                        }
+                        return [4 /*yield*/, navigator.mediaDevices.getUserMedia({
+                                audio: {
+                                    sampleRate: 16000,
+                                    channelCount: 1,
+                                    autoGainControl: true,
+                                    echoCancellation: true,
+                                    noiseSuppression: true,
+                                },
+                            })];
+                    case 1:
+                        devicesStream = _e.sent();
+                        this.mediaDevicesStream = devicesStream;
+                        this.mediaStreamAudioSource =
+                            (_b = this.audioContext) === null || _b === void 0 ? void 0 : _b.createMediaStreamSource(devicesStream);
+                        this.scriptProcessor = (_c = this.audioContext) === null || _c === void 0 ? void 0 : _c.createScriptProcessor(512, 1, 1);
+                        this.mediaStreamAudioSource.connect(this.scriptProcessor);
+                        this.scriptProcessor.connect((_d = this.audioContext) === null || _d === void 0 ? void 0 : _d.destination);
+                        this.scriptProcessor.onaudioprocess = function (event) {
+                            var _a;
+                            if (!_this.webSocket || !_this.audioRawFrame) {
+                                return;
+                            }
+                            var audioData;
+                            if (_this.isMuted) {
+                                audioData = new Float32Array(512);
+                            }
+                            else {
+                                audioData = event.inputBuffer.getChannelData(0);
+                            }
+                            var pcmS16Array = convertFloat32ToS16PCM(audioData);
+                            var pcmByteArray = new Uint8Array(pcmS16Array.buffer);
+                            var frame = _this.audioRawFrame.create({
+                                audio: {
+                                    audio: Array.from(pcmByteArray),
+                                    sampleRate: 16000,
+                                    numChannels: 1,
+                                },
+                            });
+                            var encodedFrame = new Uint8Array(_this.audioRawFrame.encode(frame).finish());
+                            (_a = _this.webSocket) === null || _a === void 0 ? void 0 : _a.send(encodedFrame);
+                        };
+                        // though room has been connected, but the stream may not be ready.
+                        return [4 /*yield*/, sleep(2000)];
+                    case 2:
+                        // though room has been connected, but the stream may not be ready.
+                        _e.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    WebSocketVoiceChat.prototype._stopVoiceChat = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b;
+            return __generator(this, function (_c) {
+                if (this.audioContext) {
+                    this.audioContext = null;
+                }
+                if (this.scriptProcessor) {
+                    this.scriptProcessor.disconnect();
+                    this.scriptProcessor = null;
+                }
+                if (this.mediaStreamAudioSource) {
+                    this.mediaStreamAudioSource.disconnect();
+                    this.mediaStreamAudioSource = null;
+                }
+                if (this.mediaDevicesStream) {
+                    (_b = (_a = this.mediaDevicesStream) === null || _a === void 0 ? void 0 : _a.getTracks()) === null || _b === void 0 ? void 0 : _b.forEach(function (track) { return track.stop(); });
+                    this.mediaDevicesStream = null;
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
+    return WebSocketVoiceChat;
+}(AbstractVoiceChatImplementation));
+
+var VoiceChatTransport;
+(function (VoiceChatTransport) {
+    VoiceChatTransport["LIVEKIT"] = "livekit";
+    VoiceChatTransport["WEBSOCKET"] = "websocket";
+})(VoiceChatTransport || (VoiceChatTransport = {}));
+var VoiceChatFactory = /** @class */ (function (_super) {
+    __extends(VoiceChatFactory, _super);
+    function VoiceChatFactory(_a) {
+        var voiceChatInstance = _a.voiceChatInstance, initialConfig = _a.initialConfig;
+        var _this = _super.call(this) || this;
+        _this.initialConfig = initialConfig;
+        _this.voiceChat = voiceChatInstance;
+        return _this;
+    }
+    Object.defineProperty(VoiceChatFactory.prototype, "isMuted", {
+        get: function () {
+            return this.voiceChat.isMuted;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(VoiceChatFactory.prototype, "isVoiceChatting", {
+        get: function () {
+            return this.voiceChat.isVoiceChatting;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    VoiceChatFactory.prototype.startVoiceChat = function (_a) {
+        return __awaiter(this, arguments, void 0, function (_b) {
+            var config = _b.config;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0: return [4 /*yield*/, this.voiceChat.startVoiceChat(__assign(__assign({}, this.initialConfig), { config: config }))];
+                    case 1:
+                        _c.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    VoiceChatFactory.prototype.stopVoiceChat = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.voiceChat.stopVoiceChat()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    VoiceChatFactory.prototype.mute = function () {
+        this.voiceChat.mute();
+    };
+    VoiceChatFactory.prototype.unmute = function () {
+        this.voiceChat.unmute();
+    };
+    VoiceChatFactory.createLiveKitVoiceChat = function (voiceChatConfig) {
+        return new this({
+            voiceChatInstance: new LivekitVoiceChat(),
+            initialConfig: voiceChatConfig,
+        });
+    };
+    VoiceChatFactory.createWebSocketVoiceChat = function (voiceChatConfig) {
+        return new this({
+            voiceChatInstance: new WebSocketVoiceChat(),
+            initialConfig: voiceChatConfig,
+        });
+    };
+    return VoiceChatFactory;
+}(AbstractVoiceChat));
+
+var AvatarQuality;
+(function (AvatarQuality) {
+    AvatarQuality["Low"] = "low";
+    AvatarQuality["Medium"] = "medium";
+    AvatarQuality["High"] = "high";
+})(AvatarQuality || (AvatarQuality = {}));
+var VoiceEmotion;
+(function (VoiceEmotion) {
+    VoiceEmotion["EXCITED"] = "excited";
+    VoiceEmotion["SERIOUS"] = "serious";
+    VoiceEmotion["FRIENDLY"] = "friendly";
+    VoiceEmotion["SOOTHING"] = "soothing";
+    VoiceEmotion["BROADCASTER"] = "broadcaster";
+})(VoiceEmotion || (VoiceEmotion = {}));
+var ElevenLabsModel;
+(function (ElevenLabsModel) {
+    ElevenLabsModel["eleven_flash_v2_5"] = "eleven_flash_v2_5";
+    ElevenLabsModel["eleven_multilingual_v2"] = "eleven_multilingual_v2";
+})(ElevenLabsModel || (ElevenLabsModel = {}));
+var STTProvider;
+(function (STTProvider) {
+    STTProvider["DEEPGRAM"] = "deepgram";
+    STTProvider["GLADIA"] = "gladia";
+})(STTProvider || (STTProvider = {}));
+var TaskType;
+(function (TaskType) {
+    TaskType["TALK"] = "talk";
+    TaskType["REPEAT"] = "repeat";
+})(TaskType || (TaskType = {}));
+var TaskMode;
+(function (TaskMode) {
+    TaskMode["SYNC"] = "sync";
+    TaskMode["ASYNC"] = "async";
+})(TaskMode || (TaskMode = {}));
+// event types --------------------------------
+var StreamingEvents;
+(function (StreamingEvents) {
+    StreamingEvents["AVATAR_START_TALKING"] = "avatar_start_talking";
+    StreamingEvents["AVATAR_STOP_TALKING"] = "avatar_stop_talking";
+    StreamingEvents["AVATAR_TALKING_MESSAGE"] = "avatar_talking_message";
+    StreamingEvents["AVATAR_END_MESSAGE"] = "avatar_end_message";
+    StreamingEvents["USER_TALKING_MESSAGE"] = "user_talking_message";
+    StreamingEvents["USER_END_MESSAGE"] = "user_end_message";
+    StreamingEvents["USER_START"] = "user_start";
+    StreamingEvents["USER_STOP"] = "user_stop";
+    StreamingEvents["USER_SILENCE"] = "user_silence";
+    StreamingEvents["STREAM_READY"] = "stream_ready";
+    StreamingEvents["STREAM_DISCONNECTED"] = "stream_disconnected";
+    StreamingEvents["CONNECTION_QUALITY_CHANGED"] = "connection_quality_changed";
+})(StreamingEvents || (StreamingEvents = {}));
+var APIError = /** @class */ (function (_super) {
+    __extends(APIError, _super);
+    function APIError(message, status, responseText) {
+        var _this = _super.call(this, message) || this;
+        _this.name = 'APIError';
+        _this.status = status;
+        _this.responseText = responseText;
+        return _this;
+    }
+    return APIError;
+}(Error));
+var ConnectionQualityIndicatorClass = QualityIndicatorMixer({
+    TrackerClass: LiveKitConnectionQualityIndicator,
+    getParams: function (room) { return room; },
+}, {
+    TrackerClass: WebRTCConnectionQualityIndicator,
+    getParams: function (room) { var _a; return ((_a = room.engine.pcManager) === null || _a === void 0 ? void 0 : _a.subscriber)._pc; },
+});
+var StreamingAvatar = /** @class */ (function () {
+    function StreamingAvatar(_a) {
+        var token = _a.token, _b = _a.basePath, basePath = _b === void 0 ? 'https://api.heygen.com' : _b;
+        var _this = this;
+        this.room = null;
+        this.mediaStream = null;
+        this.eventTarget = new EventTarget();
+        this.webSocket = null;
+        this.sessionId = null;
+        this.voiceChat = null;
+        this.isLiveKitTransport = false;
+        this.enablePushToTalk = false;
+        this.token = token;
+        this.basePath = basePath;
+        this.connectionQualityIndicator = new ConnectionQualityIndicatorClass(function (quality) {
+            return _this.emit(StreamingEvents.CONNECTION_QUALITY_CHANGED, quality);
+        });
+    }
+    Object.defineProperty(StreamingAvatar.prototype, "connectionQuality", {
+        get: function () {
+            return this.connectionQualityIndicator.connectionQuality;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(StreamingAvatar.prototype, "isInputAudioMuted", {
+        get: function () {
+            var _a, _b;
+            return (_b = (_a = this.voiceChat) === null || _a === void 0 ? void 0 : _a.isMuted) !== null && _b !== void 0 ? _b : true;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    StreamingAvatar.prototype.muteInputAudio = function () {
+        var _a;
+        (_a = this.voiceChat) === null || _a === void 0 ? void 0 : _a.mute();
+    };
+    StreamingAvatar.prototype.unmuteInputAudio = function () {
+        var _a;
+        (_a = this.voiceChat) === null || _a === void 0 ? void 0 : _a.unmute();
+    };
+    StreamingAvatar.prototype.createStartAvatar = function (requestData) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sessionInfo;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.newSession(requestData)];
+                    case 1:
+                        sessionInfo = _a.sent();
+                        return [2 /*return*/, this.startAvatar(requestData, sessionInfo)];
+                }
+            });
+        });
+    };
+    StreamingAvatar.prototype.startAvatar = function (requestData, sessionInfo) {
+        return __awaiter(this, void 0, void 0, function () {
+            var room, mediaStream;
+            var _this = this;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        this.sessionId = sessionInfo.session_id;
+                        this.isLiveKitTransport =
+                            requestData.voiceChatTransport === VoiceChatTransport.LIVEKIT;
+                        room = new Room({
+                            adaptiveStream: true,
+                            dynacast: true,
+                            videoCaptureDefaults: {
+                                resolution: VideoPresets.h720.resolution,
+                            },
+                        });
+                        this.room = room;
+                        this.mediaStream = null;
+                        this.enablePushToTalk = (_a = requestData.enablePushToTalk) !== null && _a !== void 0 ? _a : false;
+                        room.on(RoomEvent.DataReceived, function (roomMessage) {
+                            var eventMsg = null;
+                            try {
+                                var messageString = new TextDecoder().decode(roomMessage);
+                                eventMsg = JSON.parse(messageString);
+                            }
+                            catch (e) {
+                                console.error(e);
+                            }
+                            if (!eventMsg) {
+                                return;
+                            }
+                            _this.emit(eventMsg.type, eventMsg);
+                        });
+                        mediaStream = new MediaStream();
+                        room.on(RoomEvent.TrackSubscribed, function (track) {
+                            if (track.kind === 'video' || track.kind === 'audio') {
+                                mediaStream.addTrack(track.mediaStreamTrack);
+                                var hasVideoTrack = mediaStream.getVideoTracks().length > 0;
+                                var hasAudioTrack = mediaStream.getAudioTracks().length > 0;
+                                if (hasVideoTrack && hasAudioTrack && !_this.mediaStream) {
+                                    _this.mediaStream = mediaStream;
+                                    _this.emit(StreamingEvents.STREAM_READY, _this.mediaStream);
+                                }
+                            }
+                        });
+                        room.on(RoomEvent.TrackUnsubscribed, function (track) {
+                            var mediaTrack = track.mediaStreamTrack;
+                            if (mediaTrack) {
+                                mediaStream.removeTrack(mediaTrack);
+                            }
+                        });
+                        room.on(RoomEvent.Disconnected, function (reason) {
+                            _this.emit(StreamingEvents.STREAM_DISCONNECTED, reason);
+                        });
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, room.prepareConnection(sessionInfo.url, sessionInfo.access_token)];
+                    case 2:
+                        _b.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        _b.sent();
+                        return [3 /*break*/, 4];
+                    case 4: return [4 /*yield*/, this.startSession()];
+                    case 5:
+                        _b.sent();
+                        return [4 /*yield*/, room.connect(sessionInfo.url, sessionInfo.access_token)];
+                    case 6:
+                        _b.sent();
+                        return [4 /*yield*/, this.connectWebSocket({ useSilencePrompt: !!requestData.useSilencePrompt })];
+                    case 7:
+                        _b.sent();
+                        this.initVoiceChat(requestData.voiceChatTransport || VoiceChatTransport.WEBSOCKET);
+                        this.connectionQualityIndicator.start(room);
+                        return [2 /*return*/, sessionInfo];
+                }
+            });
+        });
+    };
+    StreamingAvatar.prototype.startVoiceChat = function () {
+        return __awaiter(this, arguments, void 0, function (_a) {
+            var _b;
+            var _c = _a === void 0 ? {} : _a, isInputAudioMuted = _c.isInputAudioMuted;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0: return [4 /*yield*/, ((_b = this.voiceChat) === null || _b === void 0 ? void 0 : _b.startVoiceChat({ config: { defaultMuted: isInputAudioMuted } }))];
+                    case 1:
+                        _d.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    StreamingAvatar.prototype.closeVoiceChat = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, ((_a = this.voiceChat) === null || _a === void 0 ? void 0 : _a.stopVoiceChat())];
+                    case 1:
+                        _b.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    StreamingAvatar.prototype.newSession = function (requestData) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b, _c, _d, _e;
+            return __generator(this, function (_f) {
+                return [2 /*return*/, this.request('/v1/streaming.new', {
+                        avatar_name: requestData.avatarName,
+                        quality: requestData.quality,
+                        knowledge_base_id: requestData.knowledgeId,
+                        knowledge_base: requestData.knowledgeBase,
+                        voice: {
+                            voice_id: (_a = requestData.voice) === null || _a === void 0 ? void 0 : _a.voiceId,
+                            rate: (_b = requestData.voice) === null || _b === void 0 ? void 0 : _b.rate,
+                            emotion: (_c = requestData.voice) === null || _c === void 0 ? void 0 : _c.emotion,
+                            elevenlabs_settings: __assign(__assign({}, (_d = requestData === null || requestData === void 0 ? void 0 : requestData.voice) === null || _d === void 0 ? void 0 : _d.elevenlabsSettings), { model_id: (_e = requestData.voice) === null || _e === void 0 ? void 0 : _e.model }),
+                        },
+                        language: requestData.language,
+                        version: 'v2',
+                        video_encoding: 'H264',
+                        source: 'sdk',
+                        disable_idle_timeout: requestData.disableIdleTimeout,
+                        stt_settings: requestData.sttSettings,
+                        ia_is_livekit_transport: requestData.voiceChatTransport === VoiceChatTransport.LIVEKIT,
+                        silence_response: requestData.useSilencePrompt,
+                        activity_idle_timeout: requestData.activityIdleTimeout,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.startSession = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.request('/v1/streaming.start', {
+                        session_id: this.sessionId,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.speak = function (requestData) {
+        return __awaiter(this, void 0, void 0, function () {
+            var taskType, taskMode;
+            return __generator(this, function (_a) {
+                taskType = requestData.taskType || requestData.task_type || TaskType.TALK;
+                taskMode = requestData.taskMode || TaskMode.ASYNC;
+                // livekit/websocket text transport supports only async talk task
+                if (taskType === TaskType.TALK && taskMode === TaskMode.ASYNC) {
+                    if (this.isLiveKitTransport && this.room) {
+                        this.sendLivekitMessage(requestData.text);
+                        return [2 /*return*/];
+                    }
+                    if (!this.isLiveKitTransport && this.webSocket && this.audioRawFrame) {
+                        this.sendWebsocketMessage(requestData.text);
+                        return [2 /*return*/];
+                    }
+                }
+                return [2 /*return*/, this.request('/v1/streaming.task', {
+                        text: requestData.text,
+                        session_id: this.sessionId,
+                        task_mode: requestData.taskMode,
+                        task_type: requestData.taskType,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.startListening = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.request('/v1/streaming.start_listening', {
+                        session_id: this.sessionId,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.stopListening = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.request('/v1/streaming.stop_listening', {
+                        session_id: this.sessionId,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.interrupt = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.request('/v1/streaming.interrupt', {
+                        session_id: this.sessionId,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.stopAvatar = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                // clear some resources
+                this.closeVoiceChat();
+                this.connectionQualityIndicator.stop();
+                this.voiceChat = null;
+                if (this.webSocket) {
+                    this.webSocket.close();
+                    this.webSocket = null;
+                }
+                return [2 /*return*/, this.request('/v1/streaming.stop', {
+                        session_id: this.sessionId,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.pushToTalkStart = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (!this.isLiveKitTransport) {
+                    throw new Error('push to talk is only supported for LiveKit transport');
+                }
+                if (!this.enablePushToTalk) {
+                    throw new Error('push to talk is not enabled');
+                }
+                if (!this.voiceChat.isVoiceChatting) {
+                    throw new Error('voice chat is not active');
+                }
+                if (!this.room) {
+                    throw new Error('room is not initialized');
+                }
+                return [2 /*return*/, this.sendLivekitMessage("push_to_talk:start")];
+            });
+        });
+    };
+    StreamingAvatar.prototype.pushToTalkStop = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (!this.isLiveKitTransport) {
+                    throw new Error('push to talk is only supported for LiveKit transport');
+                }
+                if (!this.enablePushToTalk) {
+                    throw new Error('push to talk is not enabled');
+                }
+                if (!this.voiceChat.isVoiceChatting) {
+                    console.log('voice chat is not active');
+                }
+                if (!this.room) {
+                    throw new Error('room is not initialized');
+                }
+                return [2 /*return*/, this.sendLivekitMessage("push_to_talk:stop")];
+            });
+        });
+    };
+    StreamingAvatar.prototype.keepAlive = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.request('/v1/streaming.keep_alive', {
+                        session_id: this.sessionId,
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.on = function (eventType, listener) {
+        this.eventTarget.addEventListener(eventType, listener);
+        return this;
+    };
+    StreamingAvatar.prototype.off = function (eventType, listener) {
+        this.eventTarget.removeEventListener(eventType, listener);
+        return this;
+    };
+    StreamingAvatar.prototype.sendLivekitMessage = function (message) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data;
+            return __generator(this, function (_a) {
+                if (!this.room) {
+                    return [2 /*return*/];
+                }
+                data = new TextEncoder().encode(JSON.stringify(message));
+                this.room.localParticipant.publishData(data, { reliable: true });
+                return [2 /*return*/];
+            });
+        });
+    };
+    StreamingAvatar.prototype.sendWebsocketMessage = function (message) {
+        return __awaiter(this, void 0, void 0, function () {
+            var frame, encodedFrame;
+            var _a, _b;
+            return __generator(this, function (_c) {
+                if (!this.webSocket || !this.audioRawFrame) {
+                    return [2 /*return*/];
+                }
+                frame = (_a = this.audioRawFrame) === null || _a === void 0 ? void 0 : _a.create({
+                    text: {
+                        text: message,
+                    },
+                });
+                encodedFrame = new Uint8Array((_b = this.audioRawFrame) === null || _b === void 0 ? void 0 : _b.encode(frame).finish());
+                this.webSocket.send(encodedFrame);
+                return [2 /*return*/];
+            });
+        });
+    };
+    StreamingAvatar.prototype.initVoiceChat = function (transport) {
+        if (transport === VoiceChatTransport.WEBSOCKET) {
+            this.loadAudioRawFrame();
+            if (!this.audioRawFrame || !this.webSocket) {
+                return;
+            }
+            this.voiceChat = VoiceChatFactory.createWebSocketVoiceChat({
+                webSocket: this.webSocket,
+                audioRawFrame: this.audioRawFrame,
+            });
+        }
+        else {
+            if (!this.room) {
+                return;
+            }
+            this.voiceChat = VoiceChatFactory.createLiveKitVoiceChat({
+                room: this.room,
+            });
+        }
+    };
+    StreamingAvatar.prototype.request = function (path, params, config) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, errorText, jsonData, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 5, , 6]);
+                        return [4 /*yield*/, fetch(this.getRequestUrl(path), {
+                                method: 'POST',
+                                headers: {
+                                    Authorization: "Bearer ".concat(this.token),
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(params),
+                            })];
+                    case 1:
+                        response = _a.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        return [4 /*yield*/, response.text()];
+                    case 2:
+                        errorText = _a.sent();
+                        throw new APIError("API request failed with status ".concat(response.status), response.status, errorText);
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4:
+                        jsonData = _a.sent();
+                        return [2 /*return*/, jsonData.data];
+                    case 5:
+                        error_2 = _a.sent();
+                        throw error_2;
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    StreamingAvatar.prototype.emit = function (eventType, detail) {
+        var event = new CustomEvent(eventType, { detail: detail });
+        this.eventTarget.dispatchEvent(event);
+    };
+    StreamingAvatar.prototype.getRequestUrl = function (endpoint) {
+        return "".concat(this.basePath).concat(endpoint);
+    };
+    StreamingAvatar.prototype.connectWebSocket = function (requestData) {
+        return __awaiter(this, void 0, void 0, function () {
+            var websocketUrl;
+            var _this = this;
+            return __generator(this, function (_a) {
+                websocketUrl = "wss://".concat(new URL(this.basePath).hostname, "/v1/ws/streaming.chat?session_id=").concat(this.sessionId, "&session_token=").concat(this.token).concat(this.isLiveKitTransport ? '&arch_version=v2' : '', "&silence_response=").concat(requestData.useSilencePrompt, "&push_to_talk=").concat(this.enablePushToTalk);
+                this.webSocket = new WebSocket(websocketUrl);
+                this.webSocket.addEventListener('message', function (event) {
+                    var eventData = null;
+                    try {
+                        eventData = JSON.parse(event.data);
+                    }
+                    catch (e) {
+                        console.error(e);
+                        return;
+                    }
+                    if (eventData) {
+                        _this.emit(eventData.event_type, eventData);
+                    }
+                });
+                this.webSocket.addEventListener('close', function (event) {
+                    _this.webSocket = null;
+                });
+                return [2 /*return*/, new Promise(function (resolve, reject) {
+                        var _a, _b;
+                        (_a = _this.webSocket) === null || _a === void 0 ? void 0 : _a.addEventListener('error', function (event) {
+                            _this.webSocket = null;
+                            reject(event);
+                        });
+                        (_b = _this.webSocket) === null || _b === void 0 ? void 0 : _b.addEventListener('open', function () {
+                            resolve(true);
+                        });
+                    })];
+            });
+        });
+    };
+    StreamingAvatar.prototype.loadAudioRawFrame = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var root;
+            return __generator(this, function (_a) {
+                if (!this.audioRawFrame) {
+                    root = protobuf.Root.fromJSON(jsonDescriptor);
+                    this.audioRawFrame = root === null || root === void 0 ? void 0 : root.lookupType('pipecat.Frame');
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
+    return StreamingAvatar;
+}());
+
+export { AvatarQuality, ConnectionQuality, ElevenLabsModel, STTProvider, StreamingEvents, TaskMode, TaskType, VoiceChatTransport, VoiceEmotion, StreamingAvatar as default };

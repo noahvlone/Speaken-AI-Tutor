@@ -1,0 +1,11 @@
+import { IssueDetectorResult, WebRTCStatsParsed } from '../types';
+import BaseIssueDetector, { BaseIssueDetectorParams } from './BaseIssueDetector';
+interface AvailableOutgoingBitrateIssueDetectorParams extends BaseIssueDetectorParams {
+    availableOutgoingBitrateThreshold?: number;
+}
+declare class AvailableOutgoingBitrateIssueDetector extends BaseIssueDetector {
+    #private;
+    constructor(params?: AvailableOutgoingBitrateIssueDetectorParams);
+    performDetection(data: WebRTCStatsParsed): IssueDetectorResult;
+}
+export default AvailableOutgoingBitrateIssueDetector;

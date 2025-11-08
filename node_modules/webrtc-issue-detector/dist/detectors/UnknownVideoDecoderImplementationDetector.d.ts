@@ -1,0 +1,12 @@
+import { IssueDetectorResult, WebRTCStatsParsed } from '../types';
+import BaseIssueDetector, { PrevStatsCleanupPayload } from './BaseIssueDetector';
+declare class UnknownVideoDecoderImplementationDetector extends BaseIssueDetector {
+    #private;
+    readonly UNKNOWN_DECODER = "unknown";
+    performDetection(data: WebRTCStatsParsed): IssueDetectorResult;
+    protected performPrevStatsCleanup(payload: PrevStatsCleanupPayload): void;
+    private processData;
+    private setLastDecoderWithIssue;
+    private hadLastDecoderWithIssue;
+}
+export default UnknownVideoDecoderImplementationDetector;

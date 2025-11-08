@@ -1,0 +1,14 @@
+import { IssueDetectorResult, WebRTCStatsParsedWithNetworkScores } from '../types';
+import BaseIssueDetector from './BaseIssueDetector';
+interface FrozenVideoTrackDetectorParams {
+    avgFreezeDurationThresholdMs?: number;
+    frozenDurationThresholdPct?: number;
+    minMosQuality?: number;
+}
+declare class FrozenVideoTrackDetector extends BaseIssueDetector {
+    #private;
+    constructor(params?: FrozenVideoTrackDetectorParams);
+    performDetection(data: WebRTCStatsParsedWithNetworkScores): IssueDetectorResult;
+    private processData;
+}
+export default FrozenVideoTrackDetector;

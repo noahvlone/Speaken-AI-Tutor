@@ -1,0 +1,13 @@
+import { IssueDetectorResult, WebRTCStatsParsed } from '../types';
+import BaseIssueDetector, { BaseIssueDetectorParams } from './BaseIssueDetector';
+interface OutboundNetworkIssueDetectorParams extends BaseIssueDetectorParams {
+    highPacketLossThresholdPct?: number;
+    highJitterThreshold?: number;
+}
+declare class OutboundNetworkIssueDetector extends BaseIssueDetector {
+    #private;
+    constructor(params?: OutboundNetworkIssueDetectorParams);
+    performDetection(data: WebRTCStatsParsed): IssueDetectorResult;
+    private processData;
+}
+export default OutboundNetworkIssueDetector;

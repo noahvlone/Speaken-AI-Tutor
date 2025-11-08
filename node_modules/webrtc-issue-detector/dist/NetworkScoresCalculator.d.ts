@@ -1,0 +1,9 @@
+import { NetworkScores, INetworkScoresCalculator, WebRTCStatsParsed } from './types';
+declare class NetworkScoresCalculator implements INetworkScoresCalculator {
+    #private;
+    calculate(data: WebRTCStatsParsed): NetworkScores;
+    private calculateOutboundScore;
+    private calculateInboundScore;
+    private calculateMOS;
+}
+export default NetworkScoresCalculator;

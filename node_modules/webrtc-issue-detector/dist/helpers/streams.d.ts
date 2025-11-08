@@ -1,0 +1,2 @@
+import { WebRTCStatsParsedWithNetworkScores } from '../types';
+export declare const isDtxLikeBehavior: (ssrc: number, allProcessedStats: WebRTCStatsParsedWithNetworkScores[], stdDevThreshold?: number) => boolean;

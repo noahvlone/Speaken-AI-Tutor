@@ -1,0 +1,12 @@
+import { IssueDetectorResult, WebRTCStatsParsed } from '../types';
+import BaseIssueDetector, { BaseIssueDetectorParams } from './BaseIssueDetector';
+interface NetworkMediaSyncIssueDetectorParams extends BaseIssueDetectorParams {
+    correctedSamplesThresholdPct?: number;
+}
+declare class NetworkMediaSyncIssueDetector extends BaseIssueDetector {
+    #private;
+    constructor(params?: NetworkMediaSyncIssueDetectorParams);
+    performDetection(data: WebRTCStatsParsed): IssueDetectorResult;
+    private processData;
+}
+export default NetworkMediaSyncIssueDetector;

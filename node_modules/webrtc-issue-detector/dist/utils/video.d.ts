@@ -1,0 +1,2 @@
+import { WebRTCStatsParsed } from '../types';
+export declare const isSvcSpatialLayerChanged: (ssrc: number, allProcessedStats: WebRTCStatsParsed[]) => boolean;

@@ -1,0 +1,21 @@
+/// <reference types="node" />
+import { EventEmitter } from 'events';
+import { CompositeStatsParser } from '../types';
+interface PeriodicWebRTCStatsReporterParams {
+    compositeStatsParser: CompositeStatsParser;
+    getStatsInterval?: number;
+}
+declare class PeriodicWebRTCStatsReporter extends EventEmitter {
+    static readonly STATS_REPORT_READY_EVENT = "stats-report-ready";
+    static readonly STATS_REPORTS_PARSED = "stats-reports-parsed";
+    private isStopped;
+    private reportTimer;
+    private readonly getStatsInterval;
+    private readonly compositeStatsParser;
+    constructor(params: PeriodicWebRTCStatsReporterParams);
+    get isRunning(): boolean;
+    startReporting(): void;
+    stopReporting(): void;
+    private parseReports;
+}
+export default PeriodicWebRTCStatsReporter;

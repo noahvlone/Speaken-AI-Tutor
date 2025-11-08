@@ -1,0 +1,22 @@
+import { ConnectionInfo, StatsParser, StatsReportItem, Logger } from '../types';
+interface WebRTCStatsParserParams {
+    ignoreSSRCList?: number[];
+    logger: Logger;
+}
+declare class RTCStatsParser implements StatsParser {
+    private readonly prevStats;
+    private readonly allowedReportTypes;
+    private readonly ignoreSSRCList;
+    private readonly logger;
+    constructor(params: WebRTCStatsParserParams);
+    get previouslyParsedStatsConnectionsIds(): string[];
+    parse(connection: ConnectionInfo): Promise<StatsReportItem | undefined>;
+    private getConnectionStats;
+    private mapReportsStats;
+    private updateMappedStatsWithReportItemData;
+    private getMediaType;
+    private propagateStatsWithRateValues;
+    private mapConnectionStatsIfNecessary;
+    private prepareConnectionStats;
+}
+export default RTCStatsParser;

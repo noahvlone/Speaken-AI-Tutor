@@ -1,0 +1,12 @@
+export declare const createTaskScheduler: () => (payload: {
+    taskId: string;
+    callback: () => void;
+    delayMs: number;
+    maxJitterMs?: number;
+}) => void;
+export declare const scheduleTask: (payload: {
+    taskId: string;
+    callback: () => void;
+    delayMs: number;
+    maxJitterMs?: number;
+}) => void;

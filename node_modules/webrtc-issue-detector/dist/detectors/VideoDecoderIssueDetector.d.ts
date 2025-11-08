@@ -1,0 +1,14 @@
+import { IssueDetectorResult, WebRTCStatsParsedWithNetworkScores } from '../types';
+import BaseIssueDetector, { BaseIssueDetectorParams } from './BaseIssueDetector';
+interface VideoDecoderIssueDetectorParams extends BaseIssueDetectorParams {
+    volatilityThreshold?: number;
+    affectedStreamsPercentThreshold?: number;
+    minMosQuality?: number;
+}
+declare class VideoDecoderIssueDetector extends BaseIssueDetector {
+    #private;
+    constructor(params?: VideoDecoderIssueDetectorParams);
+    performDetection(data: WebRTCStatsParsedWithNetworkScores): IssueDetectorResult;
+    private processData;
+}
+export default VideoDecoderIssueDetector;

@@ -1,0 +1,22 @@
+import { CompositeStatsParser, ConnectionInfo, StatsParser, StatsReportItem } from '../types';
+export interface AddConnectionPayload {
+    id?: string;
+    pc: RTCPeerConnection;
+}
+export interface RemoveConnectionPayload {
+    pc: RTCPeerConnection;
+}
+interface CompositeRTCStatsParserParams {
+    statsParser: StatsParser;
+}
+declare class CompositeRTCStatsParser implements CompositeStatsParser {
+    private readonly connections;
+    private readonly statsParser;
+    constructor(params: CompositeRTCStatsParserParams);
+    listConnections(): ConnectionInfo[];
+    addPeerConnection(payload: AddConnectionPayload): void;
+    removePeerConnection(payload: RemoveConnectionPayload): void;
+    parse(): Promise<StatsReportItem[]>;
+    private removeConnectionsByIndexes;
+}
+export default CompositeRTCStatsParser;

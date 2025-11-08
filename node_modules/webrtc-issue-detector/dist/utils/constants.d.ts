@@ -1,0 +1,2 @@
+export declare const CLEANUP_PREV_STATS_TTL_MS = 35000;
+export declare const MAX_PARSED_STATS_STORAGE_SIZE = 5;

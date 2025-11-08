@@ -1,0 +1,4 @@
+export declare const calculateMean: (values: number[]) => number;
+export declare const calculateVariance: (mean: number, values: number[]) => number;
+export declare const calculateStandardDeviation: (values: number[]) => number;
+export declare const calculateVolatility: (values: number[]) => number;

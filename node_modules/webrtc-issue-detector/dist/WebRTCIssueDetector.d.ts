@@ -1,0 +1,21 @@
+import { WebRTCIssueEmitter } from './WebRTCIssueEmitter';
+import { WebRTCIssueDetectorConstructorParams } from './types';
+declare class WebRTCIssueDetector {
+    #private;
+    readonly eventEmitter: WebRTCIssueEmitter;
+    private readonly detectors;
+    private readonly networkScoresCalculator;
+    private readonly statsReporter;
+    private readonly compositeStatsParser;
+    private readonly logger;
+    private readonly autoAddPeerConnections;
+    constructor(params: WebRTCIssueDetectorConstructorParams);
+    watchNewPeerConnections(): void;
+    stopWatchingNewPeerConnections(): void;
+    handleNewPeerConnection(pc: RTCPeerConnection, id?: string): void;
+    private emitIssues;
+    private detectIssues;
+    private calculateNetworkScores;
+    private wrapRTCPeerConnection;
+}
+export default WebRTCIssueDetector;
