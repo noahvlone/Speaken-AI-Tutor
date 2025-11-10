@@ -196,7 +196,7 @@ pnpm server:start   # start compiled server
 * [Supabase](https://supabase.com/)
 * [Vite](https://vitejs.dev/), [React](https://react.dev/)
 
-```
+
 
 ### Key reference points
 - Server endpoints and structure are defined in `server/index.ts` (HeyGen token + OpenRouter SSE proxy). :contentReference[oaicite:0]{index=0}  
