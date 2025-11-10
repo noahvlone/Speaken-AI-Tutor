@@ -204,4 +204,3 @@ pnpm server:start   # start compiled server
 - Package manager and core deps (HeyGen SDK, LiveKit client, Express/Hono, Vite/React/TS) are declared in `package.json`. :contentReference[oaicite:2]{index=2}  
 - The app routes include Roleplay and Chat pages (see `src/App.tsx`). :contentReference[oaicite:3]{index=3}
 
-```
