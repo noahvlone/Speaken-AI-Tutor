@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Diagrams</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: white;
+            padding: 20px;
+        }
+
+        .diagram-container {
+            margin-bottom: 50px;
+            padding: 20px;
+            border: 1px solid #eee;
+            display: inline-block;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="use-case" class="diagram-container">
+        <h2>Use Case Diagram</h2>
+        <pre class="mermaid">
+usecaseDiagram
+    actor User as "Learner"
+    actor AI as "AI Tutor Agent"
+    actor System as "SpeakenAI System"
+
+    package "Roleplay Session" {
+        usecase "Select Avatar Personal" as UC1
+        usecase "Speak with Avatar" as UC2
+        usecase "Receive Visual/Audio Response" as UC3
+    }
+
+    package "Text Chat Session" {
+        usecase "Send Text Message" as UC4
+        usecase "Receive Text/Correction" as UC5
+    }
+
+    package "Account & Progress" {
+        usecase "View Leaderboard" as UC6
+        usecase "Track Learning Progress" as UC7
+        usecase "Manage Profile" as UC8
+        usecase "Login/Register" as UC9
+    }
+
+    User --> UC9
+    User --> UC1
+    User --> UC2
+    User --> UC4
+    User --> UC6
+    User --> UC8
+
+    UC2 --> AI : "Send Audio"
+    AI --> UC3 : "Respond with Voice/Lip-sync"
+    
+    UC4 --> AI : "Send Text"
+    AI --> UC5 : "Respond with Text"
+
+    UC7 .-> UC2 : "Update Stats"
+    UC7 .-> UC4 : "Update Stats"
+
+    System --> UC9 : "Authenticate"
+        </pre>
+    </div>
+
+    <div style="clear:both;"></div>
+
+    <div id="activity-diagram" class="diagram-container">
+        <h2>Activity Diagram (Roleplay)</h2>
+        <pre class="mermaid">
+activityDiagram
+    start
+    :User logs in;
+    :Select "Roleplay Mode";
+    :Choose Avatar & Language;
+    
+    partition "Roleplay Session" {
+        :User speaks into Microphone;
+        :System converts Speech-to-Text (STT);
+        :Send text to LLM (OpenRouter);
+        
+        if (Error?) then (Yes)
+            :Show Error Message;
+            stop
+        else (No)
+            :LLM Generates Response;
+            fork
+                :Generate Audio (TTS);
+                :Avatar Lip-syncs;
+            fork again
+                :Show Subtitles;
+            end fork
+        endif
+    }
+    
+    :User listens/watches content;
+    :Update Session Progress;
+    
+    if (Continue?) then (Yes)
+        :Repeat Loop;
+    else (No)
+        :End Session;
+        :Save Chat History;
+    endif
+    stop
+        </pre>
+    </div>
+
+    <div style="clear:both;"></div>
+
+    <div id="sequence-diagram" class="diagram-container">
+        <h2>Sequence Diagram (Chat Flow)</h2>
+        <pre class="mermaid">
+sequenceDiagram
+    actor User
+    participant FE as Frontend (React)
+    participant BE as Backend (Express)
+    participant OR as OpenRouter (LLM)
+    participant DB as Supabase
+
+    User->>FE: Send Message "Hello"
+    FE->>BE: POST /api/openrouter {message}
+    activate BE
+    BE->>OR: POST /chat/completions (Stream=True)
+    activate OR
+    OR-->>BE: Stream Chunk "Hel..."
+    BE-->>FE: SSE Event "Hel..."
+    OR-->>BE: Stream Chunk "lo!"
+    BE-->>FE: SSE Event "lo!"
+    OR-->>BE: Stream [DONE]
+    deactivate OR
+    BE-->>FE: Close Stream
+    deactivate BE
+
+    FE->>DB: Save Message (User)
+    FE->>DB: Save Message (Assistant)
+    DB-->>FE: Success
+    FE-->>User: Update UI (Complete)
+        </pre>
+    </div>
+
+    <div style="clear:both;"></div>
+
+    <div id="class-diagram" class="diagram-container">
+        <h2>Class Diagram (Data Models)</h2>
+        <pre class="mermaid">
+classDiagram
+    class User {
+        +UUID id
+        +String email
+        +String full_name
+        +String avatar_url
+        +Int current_streak
+        +Int total_xp
+        +register()
+        +login()
+    }
+
+    class ChatSession {
+        +UUID id
+        +UUID user_id
+        +String avatar_id
+        +String language_code
+        +DateTime created_at
+        +endSession()
+    }
+
+    class ChatMessage {
+        +UUID id
+        +UUID session_id
+        +String role
+        +String content
+        +JSON metadata
+        +DateTime created_at
+    }
+
+    class UserProgress {
+        +UUID id
+        +UUID user_id
+        +Int grammar_score
+        +Int fluency_score
+        +Int words_spoken
+    }
+
+    class Challenge {
+        +UUID id
+        +String type
+        +Int target_count
+        +Int reward_xp
+    }
+
+    User "1" --> "*" ChatSession : has
+    ChatSession "1" --> "*" ChatMessage : contains
+    User "1" --> "1" UserProgress : tracks
+    User "1" --> "*" Challenge : participates
+        </pre>
+    </div>
+
+</body>
+
+</html>

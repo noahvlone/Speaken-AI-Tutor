@@ -1,0 +1,35 @@
+{
+    "common": {
+        "welcome": "Selamat datang kembali",
+        "ready": "Siap meningkatkan kemampuan Bahasa Inggris kamu hari ini?",
+        "chat_practice": "Latihan Chat",
+        "roleplay": "Roleplay AI",
+        "daily_challenge": "Tantangan Harian",
+        "progress": "Kemajuan",
+        "settings": "Pengaturan",
+        "logout": "Keluar",
+        "home": "Beranda"
+    },
+    "home": {
+        "streak": "Runtutan",
+        "days": "hari",
+        "level": "Level",
+        "accuracy": "Akurasi",
+        "xp": "XP",
+        "writing_focus": "Fokus Menulis",
+        "speaking_focus": "Fokus Berbicara",
+        "start_chat": "Mulai Latihan Chat",
+        "start_roleplay": "Mulai Roleplay",
+        "view_progress": "Lihat Kemajuan",
+        "quick_practice": "Latihan Cepat"
+    },
+    "chat": {
+        "title": "Latihan Chat",
+        "subtitle": "Latih tulisan Bahasa Inggris dengan tutor AI",
+        "placeholder": "Ketik pesan kamu dalam Bahasa Inggris...",
+        "thinking": "Sedang berpikir...",
+        "new_chat": "Chat Baru",
+        "select_chat": "Pilih Chat",
+        "your_chats": "Chat Kamu"
+    }
+}

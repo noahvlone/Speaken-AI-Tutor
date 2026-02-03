@@ -1,0 +1,35 @@
+{
+    "common": {
+        "welcome": "Welcome back",
+        "ready": "Ready to level up your English skills today?",
+        "chat_practice": "Chat Practice",
+        "roleplay": "AI Roleplay",
+        "daily_challenge": "Daily Challenge",
+        "progress": "Progress",
+        "settings": "Settings",
+        "logout": "Logout",
+        "home": "Home"
+    },
+    "home": {
+        "streak": "Streak",
+        "days": "days",
+        "level": "Level",
+        "accuracy": "Accuracy",
+        "xp": "XP",
+        "writing_focus": "Writing Focus",
+        "speaking_focus": "Speaking Focus",
+        "start_chat": "Start Chat Practice",
+        "start_roleplay": "Start Roleplay",
+        "view_progress": "View Progress",
+        "quick_practice": "Quick Practice"
+    },
+    "chat": {
+        "title": "Chat Practice",
+        "subtitle": "Practice English writing with AI tutor",
+        "placeholder": "Type your message in English...",
+        "thinking": "Thinking...",
+        "new_chat": "New Chat",
+        "select_chat": "Select Chat",
+        "your_chats": "Your Chats"
+    }
+}
