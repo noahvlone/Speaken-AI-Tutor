@@ -4,6 +4,7 @@ import StreamingAvatar, {
   UserTalkingMessageEvent,
 } from "@heygen/streaming-avatar";
 import React, { useRef, useState } from "react";
+import { AnalysisResult } from "../../lib/grammarService";
 
 export enum StreamingAvatarSessionState {
   INACTIVE = "inactive",
@@ -20,6 +21,7 @@ export interface Message {
   id: string;
   sender: MessageSender;
   content: string;
+  feedback?: AnalysisResult;
 }
 
 type StreamingAvatarContextProps = {
@@ -40,6 +42,7 @@ type StreamingAvatarContextProps = {
 
   messages: Message[];
   clearMessages: () => void;
+  updateMessageFeedback: (id: string, feedback: AnalysisResult) => void;
   handleUserTalkingMessage: ({
     detail,
   }: {
@@ -67,28 +70,29 @@ const StreamingAvatarContext = React.createContext<StreamingAvatarContextProps>(
   {
     avatarRef: { current: null },
     isMuted: true,
-    setIsMuted: () => {},
+    setIsMuted: () => { },
     isVoiceChatLoading: false,
-    setIsVoiceChatLoading: () => {},
+    setIsVoiceChatLoading: () => { },
     sessionState: StreamingAvatarSessionState.INACTIVE,
-    setSessionState: () => {},
+    setSessionState: () => { },
     isVoiceChatActive: false,
-    setIsVoiceChatActive: () => {},
+    setIsVoiceChatActive: () => { },
     stream: null,
-    setStream: () => {},
+    setStream: () => { },
     messages: [],
-    clearMessages: () => {},
-    handleUserTalkingMessage: () => {},
-    handleStreamingTalkingMessage: () => {},
-    handleEndMessage: () => {},
+    clearMessages: () => { },
+    updateMessageFeedback: () => { },
+    handleUserTalkingMessage: () => { },
+    handleStreamingTalkingMessage: () => { },
+    handleEndMessage: () => { },
     isListening: false,
-    setIsListening: () => {},
+    setIsListening: () => { },
     isUserTalking: false,
-    setIsUserTalking: () => {},
+    setIsUserTalking: () => { },
     isAvatarTalking: false,
-    setIsAvatarTalking: () => {},
+    setIsAvatarTalking: () => { },
     connectionQuality: ConnectionQuality.UNKNOWN,
-    setConnectionQuality: () => {},
+    setConnectionQuality: () => { },
   },
 );
 
@@ -124,6 +128,12 @@ const useStreamingAvatarVoiceChatState = () => {
 const useStreamingAvatarMessageState = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const currentSenderRef = useRef<MessageSender | null>(null);
+
+  const updateMessageFeedback = (id: string, feedback: AnalysisResult) => {
+    setMessages((prev) =>
+      prev.map((msg) => (msg.id === id ? { ...msg, feedback } : msg))
+    );
+  };
 
   const handleUserTalkingMessage = ({
     detail,
@@ -187,6 +197,7 @@ const useStreamingAvatarMessageState = () => {
       setMessages([]);
       currentSenderRef.current = null;
     },
+    updateMessageFeedback,
     handleUserTalkingMessage,
     handleStreamingTalkingMessage,
     handleEndMessage,

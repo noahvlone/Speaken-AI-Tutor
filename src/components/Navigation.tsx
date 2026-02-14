@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Video, Trophy, Settings, LogOut, User, Sparkles, Menu, X, BarChart2, Clock, Award, Globe, ChevronUp } from 'lucide-react';
+import { Home, MessageSquare, Video, Trophy, Settings, LogOut, User, Sparkles, Menu, X, BarChart2, Clock, Award, Globe, ChevronUp, BookOpen, Book } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -57,6 +57,8 @@ export function Navigation({ onLogout, userName = 'Student', avatarUrl }: Naviga
     { id: 'settings', path: '/settings', label: 'Settings', icon: Settings },
     { id: 'leaderboard', path: '/leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'progress', path: '/progress', label: 'Statistics', icon: BarChart2 },
+    { id: 'vocab-lib', path: '/library/vocabulary', label: 'Vocabulary Dictionary', icon: BookOpen },
+    { id: 'grammar-lib', path: '/library/grammar', label: 'Grammar Reference', icon: Book },
   ];
 
   return (

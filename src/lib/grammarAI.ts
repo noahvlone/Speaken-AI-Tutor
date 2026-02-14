@@ -1,31 +1,26 @@
-import { chatOpenRouter } from "./openrouter";
+// Grammar analysis using server-side AI proxy
 
 export interface GrammarError {
-    start: number;
-    end: number;
+    offset: number;
+    length: number;
     message: string;
     suggestion: string;
-    type: "grammar" | "spelling" | "style";
+    type: "grammar" | "spelling" | "style" | "pronunciation";
 }
 
 // In-memory cache for grammar analysis results
 const grammarCache = new Map<string, GrammarError[]>();
-const CACHE_MAX_SIZE = 100; // Limit cache size to prevent memory issues
+const CACHE_MAX_SIZE = 100;
 
+// Use server proxy - API key is stored on server, not browser
 export async function analyzeGrammarWithAI(text: string): Promise<GrammarError[]> {
-    // Check cache first
     if (grammarCache.has(text)) {
-        console.log('✅ Grammar cache hit for:', text.substring(0, 30) + '...');
         return grammarCache.get(text)!;
     }
 
-    const apiKey = (import.meta as any).env?.VITE_OPENROUTER_API_KEY;
-    if (!apiKey) {
-        console.warn("VITE_OPENROUTER_API_KEY is missing for grammar analysis");
-        return [];
-    }
-
-    const prompt = `Analyze this English sentence from a learner. Identity all grammar, spelling, and style errors.
+    // Note: We still ask AI for start/end because it's more conceptual for LLMs, 
+    // then we map to offset/length locally.
+    const prompt = `Analyze this English sentence from a learner. Identify all grammar, spelling, and style errors.
 Return ONLY a pure JSON array of objects with this format:
 [{"start": number, "end": number, "message": "string", "suggestion": "string", "type": "grammar" | "spelling" | "style"}]
 
@@ -37,36 +32,42 @@ Rules:
 Text to analyze: "${text}"`;
 
     try {
-        const response = await chatOpenRouter(
-            apiKey,
-            [{ role: "user", content: prompt }],
-            {
-                model: "liquid/lfm-2.5-1.2b-instruct:free",
-                temperature: 0.1,
-                stream: false
-            }
-        );
+        const response = await fetch("/api/gemini", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                prompt: prompt,
+                model: "gemini-2.0-flash",
+            }),
+        });
 
-        // If it's a non-streaming response
-        if ("text" in response) {
-            const content = response.text;
-            try {
-                // Clean markdown code blocks if any
-                const cleaned = content.replace(/```json|```/g, "").trim();
-                const json = JSON.parse(cleaned);
-                if (Array.isArray(json)) {
-                    // Cache the result
-                    if (grammarCache.size >= CACHE_MAX_SIZE) {
-                        // Remove oldest entry (first key)
-                        const firstKey = grammarCache.keys().next().value;
-                        if (firstKey) grammarCache.delete(firstKey);
-                    }
-                    grammarCache.set(text, json);
-                    return json;
+        if (!response.ok) return [];
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || "";
+
+        try {
+            const cleaned = content.replace(/```json|```/g, "").trim();
+            const json = JSON.parse(cleaned);
+            if (Array.isArray(json)) {
+                // Map start/end to offset/length
+                const mapped: GrammarError[] = json.map((err: any) => ({
+                    offset: err.start,
+                    length: err.end - err.start,
+                    message: err.message,
+                    suggestion: err.suggestion,
+                    type: err.type
+                }));
+
+                if (grammarCache.size >= CACHE_MAX_SIZE) {
+                    const firstKey = grammarCache.keys().next().value;
+                    if (firstKey) grammarCache.delete(firstKey);
                 }
-            } catch (e) {
-                console.error("Failed to parse AI grammar response:", content, e);
+                grammarCache.set(text, mapped);
+                return mapped;
             }
+        } catch (e) {
+            console.error("Failed to parse AI grammar response:", e);
         }
         return [];
     } catch (error) {
@@ -75,7 +76,6 @@ Text to analyze: "${text}"`;
     }
 }
 
-// Export function to clear cache if needed
 export function clearGrammarCache() {
     grammarCache.clear();
 }

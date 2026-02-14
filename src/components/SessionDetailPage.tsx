@@ -12,6 +12,7 @@ import {
     CheckCircle2,
     Loader2
 } from 'lucide-react';
+import { TranscriptHighlighter } from './TranscriptHighlighter';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -215,7 +216,16 @@ export function SessionDetailPage() {
                             </CardHeader>
                             <CardContent className="p-8">
                                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 max-h-[400px] overflow-y-auto whitespace-pre-wrap font-mono text-sm leading-relaxed text-slate-700">
-                                    {session.transcript || "No transcript available for this session."}
+                                    {session.transcript ? (
+                                        <TranscriptHighlighter
+                                            transcript={session.transcript}
+                                            mistakes={(session.common_mistakes || []).map(m =>
+                                                typeof m === 'string'
+                                                    ? { mistake: m, explanation: 'Check grammar', correction: '' }
+                                                    : m
+                                            )}
+                                        />
+                                    ) : "No transcript available for this session."}
                                 </div>
                             </CardContent>
                         </Card>

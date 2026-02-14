@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { getTodayWIB, getNowWIB } from '../utils/dateUtils';
 
 export interface LeaderboardEntry {
     rank: number;
@@ -18,75 +19,86 @@ export function useLeaderboard(userId: string | null) {
     const [error, setError] = useState<string | null>(null);
 
     // Load leaderboard data
-    useEffect(() => {
-        const loadLeaderboard = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+    const loadLeaderboard = async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                // Get top 10 users from leaderboard
-                const { data, error: fetchError } = await supabase
-                    .from('leaderboard_entries')
-                    .select('*')
-                    .order('total_score', { ascending: false })
-                    .limit(10);
+            // Get top 10 users from leaderboard
+            const { data: entries, error: fetchError } = await supabase
+                .from('leaderboard_entries')
+                .select('*')
+                .order('total_score', { ascending: false })
+                .limit(10);
 
-                if (fetchError) throw fetchError;
+            if (fetchError) throw fetchError;
 
-                // Format leaderboard data
-                const formattedData: LeaderboardEntry[] = await Promise.all(
-                    (data || []).map(async (entry, index) => {
-                        // Ideally we would fetch user public profile here if we had a public profiles table.
-                        // Since we can't join on auth.users directly, we'll placeholder or just use what we have.
-                        // A better approach is to store 'display_name' in leaderboard_entries if possible,
-                        // or fetch from a public_profiles table.
-
-                        // For now, to unblock the 400 error, we will use a fallback name/avatar
-                        // In a real app, create a 'profiles' table that syncs with auth.users
-
-                        // Try to get cached name if available (assuming we might add it later)
-                        const fullName = 'User';
-                        const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${entry.user_id}`;
-
-                        return {
-                            rank: index + 1,
-                            user_id: entry.user_id,
-                            name: fullName,
-                            avatar: avatarUrl,
-                            score: entry.total_score || 0,
-                            streak: entry.current_streak || 0,
-                            isCurrentUser: userId === entry.user_id
-                        };
-                    })
-                );
-
-                setLeaderboard(formattedData);
-
-                // Find current user's rank
-                const userEntry = formattedData.find(e => e.user_id === userId);
-                if (userEntry) {
-                    setCurrentUserRank(userEntry.rank);
-                } else if (userId) {
-                    // User not in top 10, get their actual rank
-                    const { data: userRankData } = await supabase
-                        .from('leaderboard_entries')
-                        .select('*')
-                        .eq('user_id', userId)
-                        .maybeSingle();
-
-                    if (userRankData) {
-                        setCurrentUserRank(userRankData.rank);
-                    }
-                }
-
-            } catch (err) {
-                console.error('Error loading leaderboard:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load leaderboard');
-            } finally {
-                setLoading(false);
+            if (!entries || entries.length === 0) {
+                setLeaderboard([]);
+                return;
             }
-        };
 
+            // Fetch public profiles for these users
+            const userIds = entries.map(e => e.user_id);
+            const { data: profiles } = await supabase
+                .from('public_profiles')
+                .select('id, full_name, avatar_url')
+                .in('id', userIds);
+
+            // Create a map for easy lookup
+            const profileMap = new Map();
+            if (profiles) {
+                profiles.forEach(p => profileMap.set(p.id, p));
+            }
+
+            // Format leaderboard data
+            const formattedData: LeaderboardEntry[] = entries.map((entry, index) => {
+                const profile = profileMap.get(entry.user_id);
+
+                // Fallback logic
+                const fullName = profile?.full_name || profile?.username || 'Anonymous User';
+                // Use profile avatar if available, otherwise fallback to Dicebear
+                const avatarUrl = profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${entry.user_id}`;
+
+                return {
+                    rank: index + 1,
+                    user_id: entry.user_id,
+                    name: fullName,
+                    avatar: avatarUrl,
+                    score: entry.total_score || 0,
+                    streak: entry.current_streak || 0,
+                    isCurrentUser: userId === entry.user_id
+                };
+            });
+
+            setLeaderboard(formattedData);
+
+            // Find current user's rank
+            const userEntry = formattedData.find(e => e.user_id === userId);
+            if (userEntry) {
+                setCurrentUserRank(userEntry.rank);
+            } else if (userId) {
+                // User not in top 10, get their actual rank
+                const { data: userRankData } = await supabase
+                    .from('leaderboard_entries')
+                    .select('rank')
+                    .eq('user_id', userId)
+                    .maybeSingle();
+
+                if (userRankData) {
+                    setCurrentUserRank(userRankData.rank);
+                }
+            }
+
+        } catch (err) {
+            console.error('Error loading leaderboard:', err);
+            setError(err instanceof Error ? err.message : 'Failed to load leaderboard');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         loadLeaderboard();
     }, [userId]);
 
@@ -113,24 +125,25 @@ export function useLeaderboard(userId: string | null) {
                     total_score: newScore,
                     current_streak: currentEntry?.current_streak || 0,
                     longest_streak: currentEntry?.longest_streak || 0,
-                    last_activity_date: new Date().toISOString().split('T')[0],
-                    updated_at: new Date().toISOString()
+                    last_activity_date: getTodayWIB(),
+                    updated_at: getNowWIB()
                 }, {
                     onConflict: 'user_id'
                 });
 
             if (upsertError) throw upsertError;
 
-            // Recalculate ranks
-            await recalculateRanks();
+            // Optional: Recalculate ranks (expensive, maybe skip or do server side)
+            // await recalculateRanks();
 
-            // Reload leaderboard
-            window.location.reload();
+            // Reload leaderboard without page refresh
+            await loadLeaderboard();
         } catch (err) {
             console.error('Error updating score:', err);
             throw err;
         }
     };
+
 
     // Update streak
     const updateStreak = async () => {
@@ -143,7 +156,7 @@ export function useLeaderboard(userId: string | null) {
                 .eq('user_id', userId)
                 .maybeSingle();
 
-            const today = new Date().toISOString().split('T')[0];
+            const today = getTodayWIB();
             const lastActivity = currentEntry?.last_activity_date;
 
             let newStreak = 1;
@@ -175,7 +188,7 @@ export function useLeaderboard(userId: string | null) {
                     current_streak: newStreak,
                     longest_streak: longestStreak,
                     last_activity_date: today,
-                    updated_at: new Date().toISOString()
+                    updated_at: getNowWIB()
                 }, {
                     onConflict: 'user_id'
                 });

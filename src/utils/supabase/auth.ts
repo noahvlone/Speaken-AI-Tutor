@@ -97,3 +97,27 @@ export async function checkAuth(): Promise<boolean> {
     const { data: { session } } = await supabase.auth.getSession();
     return !!session;
 }
+
+export async function signInWithGoogle() {
+    const supabase = createClient();
+
+    const redirectUrl = `${window.location.origin}/auth/callback`;
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: redirectUrl,
+            queryParams: {
+                access_type: 'offline',
+                prompt: 'consent',
+            },
+        },
+    });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+}
+

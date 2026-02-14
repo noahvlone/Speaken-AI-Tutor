@@ -16,25 +16,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// CORS configuration - restrict to specific origins
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:8787',
-  process.env.FRONTEND_URL || '',
-].filter(Boolean);
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+app.use(cors({ // Allow all origins for dev simplicity
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -150,6 +133,79 @@ app.post("/api/openrouter", async (req, res) => {
     }
     console.error(`[${requestId}] 💥 Proxy error:`, e?.message);
     res.status(500).json({ error: e?.message || "Proxy error" });
+  }
+});
+
+/**
+ * 3) Gemini API Proxy (Fast AI Analysis)
+ *    POST /api/gemini
+ *    Body = { prompt: string, model?: string }
+ */
+app.post("/api/gemini", async (req, res) => {
+  const requestId = Math.random().toString(36).substring(7);
+  // console.log(`[${requestId}] 🌟 Gemini AI Request started...`);
+
+  try {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+    if (!GEMINI_API_KEY) {
+      // console.error(`[${requestId}] ❌ GEMINI_API_KEY is missing! Get one from https://aistudio.google.com/apikey`);
+      return res.status(500).json({ error: "GEMINI_API_KEY is missing. Get one from https://aistudio.google.com/apikey" });
+    }
+
+    const { prompt, model = "gemini-2.0-flash" } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: "prompt is required" });
+    }
+
+    // console.log(`[${requestId}] 📡 Calling Gemini API (Model: ${model})...`);
+
+    const startTime = Date.now();
+    const upstream = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 500,
+          },
+        }),
+      }
+    );
+
+    const duration = Date.now() - startTime;
+    // console.log(`[${requestId}] 📥 Gemini responded in ${duration}ms (Status: ${upstream.status})`);
+
+    if (!upstream.ok) {
+      const errorText = await upstream.text();
+      // console.error(`[${requestId}] ❌ Gemini error:`, errorText);
+      return res.status(upstream.status).json({ error: errorText });
+    }
+
+    const data = await upstream.json() as any;
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    // console.log(`[${requestId}] ✅ Gemini response received (${text.length} chars)`);
+
+    // Return in OpenAI-compatible format for easy frontend integration
+    res.json({
+      choices: [{
+        message: {
+          content: text,
+          role: "assistant"
+        }
+      }]
+    });
+
+  } catch (e: any) {
+    // console.error(`[${requestId}] 💥 Gemini proxy error:`, e?.message);
+    res.status(500).json({ error: e?.message || "Gemini proxy error" });
   }
 });
 

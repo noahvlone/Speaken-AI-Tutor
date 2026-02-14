@@ -37,11 +37,6 @@ export const AVATARS = [
 ];
 
 export const STT_LANGUAGE_LIST = [
-  { label: "Bulgarian", value: "bg", key: "bg" },
-  { label: "Chinese", value: "zh", key: "zh" },
-  { label: "Czech", value: "cs", key: "cs" },
-  { label: "Danish", value: "da", key: "da" },
-  { label: "Dutch", value: "nl", key: "nl" },
   { label: "English", value: "en", key: "en" },
   { label: "Finnish", value: "fi", key: "fi" },
   { label: "French", value: "fr", key: "fr" },

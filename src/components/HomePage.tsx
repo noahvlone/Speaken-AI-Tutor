@@ -212,46 +212,7 @@ export function HomePage({ userName = 'User' }: HomePageProps) {
           </div>
         </div>
 
-        {/* Start Learning Grid */}
-        <div>
-          <div className="flex items-center gap-2 mb-6">
-            <Sparkles className="w-5 h-5 text-orange-400" />
-            <h2 className="text-xl font-bold text-slate-900">Start Learning</h2>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {BEGINNER_SCENARIOS.slice(0, 4).map((scenario, index) => (
-              <div
-                key={scenario.id}
-                onClick={() => navigate('/chat', { state: { beginnerScenario: scenario } })}
-                className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="bg-orange-50 w-10 h-10 rounded-full flex items-center justify-center text-xl">
-                    {scenario.icon}
-                  </div>
-                  {index === 0 ? (
-                    <div className="bg-green-500 rounded-full p-1">
-                      <CheckCircle2 className="w-3 h-3 text-white" />
-                    </div>
-                  ) : (
-                    <Badge variant="secondary" className="text-[10px] px-2 bg-slate-100 text-slate-500 hover:bg-slate-100">Pemula</Badge>
-                  )}
-                </div>
-
-                <h3 className="font-bold text-slate-900 mb-1">{scenario.titleId}</h3>
-                <p className="text-xs text-slate-500 mb-4 flex-1">{scenario.description}</p>
-
-                {/* Progress Bar styled line at bottom */}
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden mt-auto">
-                  <div
-                    className={`h-full rounded-full ${index === 0 ? 'bg-purple-600 w-full' : (index === 1 ? 'bg-purple-600 w-1/3' : 'bg-slate-200 w-0')}`}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
       </div>
     </div>

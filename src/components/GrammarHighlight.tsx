@@ -1,12 +1,13 @@
-import { AlertCircle, Sparkles, CheckCircle2, Info, XCircle } from 'lucide-react';
+import { AlertCircle, Sparkles, CheckCircle2, Info, XCircle, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export interface GrammarError {
-  start: number;
-  end: number;
+  offset: number;
+  length: number;
   message: string;
   suggestion: string;
-  type: 'grammar' | 'spelling' | 'style';
+  type: 'grammar' | 'spelling' | 'style' | 'pronunciation';
+  category?: string;
 }
 
 interface GrammarHighlightProps {
@@ -17,26 +18,26 @@ interface GrammarHighlightProps {
 
 export function GrammarHighlight({ text, errors, onErrorClick }: GrammarHighlightProps) {
   if (errors.length === 0) {
-    return <p className="whitespace-pre-wrap leading-relaxed">{text}</p>;
+    return <p className="whitespace-pre-wrap leading-relaxed font-medium text-slate-700">{text}</p>;
   }
 
   const segments: Array<{ text: string; error?: GrammarError }> = [];
   let lastIndex = 0;
 
-  // Sort errors by start position
-  const sortedErrors = [...errors].sort((a, b) => a.start - b.start);
+  // Sort errors by offset to process them in order
+  const sortedErrors = [...errors].sort((a, b) => a.offset - b.offset);
 
   sortedErrors.forEach((error) => {
     // Add text before error
-    if (error.start > lastIndex) {
-      segments.push({ text: text.slice(lastIndex, error.start) });
+    if (error.offset > lastIndex) {
+      segments.push({ text: text.slice(lastIndex, error.offset) });
     }
     // Add error text
     segments.push({
-      text: text.slice(error.start, error.end),
+      text: text.slice(error.offset, error.offset + error.length),
       error,
     });
-    lastIndex = error.end;
+    lastIndex = error.offset + error.length;
   });
 
   // Add remaining text
@@ -45,21 +46,24 @@ export function GrammarHighlight({ text, errors, onErrorClick }: GrammarHighligh
   }
 
   return (
-    <p className="whitespace-pre-wrap leading-relaxed">
+    <p className="whitespace-pre-wrap leading-relaxed font-medium text-slate-700">
       {segments.map((segment, index) => {
         if (segment.error) {
+          const isPronunciation = segment.error.type === 'pronunciation';
           const styles =
             segment.error.type === 'grammar'
-              ? 'bg-rose-100 text-rose-700 border-rose-300'
+              ? 'bg-rose-100/80 text-rose-700 border-rose-200 shadow-sm shadow-rose-100/50'
               : segment.error.type === 'spelling'
-                ? 'bg-amber-100 text-amber-700 border-amber-300'
-                : 'bg-blue-100 text-blue-700 border-blue-300';
+                ? 'bg-amber-100/80 text-amber-700 border-amber-200 shadow-sm shadow-amber-100/50'
+                : segment.error.type === 'pronunciation'
+                  ? 'bg-indigo-100/80 text-indigo-700 border-indigo-200 shadow-sm shadow-indigo-100/50'
+                  : 'bg-blue-100/80 text-blue-700 border-blue-200 shadow-sm shadow-blue-100/50';
 
           return (
             <motion.span
               key={index}
-              whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.2)" }}
-              className={`${styles} cursor-help transition-all rounded px-0.5 border-b-2 border-dashed decoration-skip-ink-none`}
+              whileHover={{ scale: 1.05, y: -1 }}
+              className={`${styles} cursor-help transition-all rounded-full px-2.5 py-0.5 border inline-block font-bold text-[0.95em] mx-1 decoration-skip-ink-none`}
               onClick={(e) => {
                 e.stopPropagation();
                 onErrorClick(segment.error!);
@@ -87,7 +91,9 @@ export function GrammarFeedback({ error, onClose }: GrammarFeedbackProps) {
       ? { icon: XCircle, color: 'text-rose-500', bg: 'bg-rose-50', border: 'border-rose-100', accent: 'bg-rose-500' }
       : error.type === 'spelling'
         ? { icon: AlertCircle, color: 'text-amber-500', bg: 'bg-amber-50', border: 'border-amber-100', accent: 'bg-amber-500' }
-        : { icon: Info, color: 'text-blue-500', bg: 'bg-blue-50', border: 'border-blue-100', accent: 'bg-blue-500' };
+        : error.type === 'pronunciation'
+          ? { icon: Mic, color: 'text-indigo-500', bg: 'bg-indigo-50', border: 'border-indigo-100', accent: 'bg-indigo-500' }
+          : { icon: Info, color: 'text-blue-500', bg: 'bg-blue-50', border: 'border-blue-100', accent: 'bg-blue-500' };
 
   const Icon = config.icon;
 
@@ -97,7 +103,6 @@ export function GrammarFeedback({ error, onClose }: GrammarFeedbackProps) {
       animate={{ opacity: 1, y: 0 }}
       className={`relative overflow-hidden ${config.bg} border ${config.border} rounded-2xl p-5 shadow-sm mb-4 group`}
     >
-      {/* Decorative side accent */}
       <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${config.accent} opacity-70`} />
 
       <div className="flex items-start gap-4">

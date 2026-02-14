@@ -24,10 +24,28 @@ Tujuan dari penelitian ini adalah:
 Manfaat yang diharapkan dari penelitian ini adalah memberikan alternatif media pembelajaran bahasa Inggris yang fleksibel, interaktif, dan dapat diakses kapan saja, serta membantu pengguna meningkatkan kepercayaan diri dalam berbicara bahasa Inggris tanpa rasa takut salah.
 
 ## 1.5 Batasan Masalah
+Agar penelitian ini terfokus dan terarah, batasan masalah dalam pengembangan sistem AI Tutor Bahasa Inggris ini adalah sebagai berikut:
+
+### Teknis
 1.  Model bahasa yang digunakan dibatasi pada LLM yang tersedia melalui OpenRouter.
-2.  Fokus pembelajaran adalah bahasa Inggris (English as an International Language).
-3.  Avatar interaktif menggunakan layanan pihak ketiga (HeyGen API) untuk visualisasi dan lip-sync.
-4.  Evaluasi sistem dilakukan dalam skala terbatas.
+2.  Sistem mendukung interaksi berbasis teks dan suara, tanpa fitur *fine-tuning* model LLM secara khusus.
+3.  Avatar interaktif menggunakan layanan pihak ketiga (HeyGen API) untuk fitur *lip-sync* dan *text-to-speech*.
+4.  Sistem mengasumsikan pengguna memiliki koneksi internet stabil untuk akses fitur AI dan avatar interaktif.
+
+### Target Pengguna
+5.  Target pengguna utama adalah pelajar usia 15-35 tahun dengan tingkat kemahiran bahasa Inggris level pemula hingga menengah (*CEFR A1-B1*).
+6.  Sistem difokuskan untuk pengguna di Indonesia yang ingin meningkatkan kemampuan bahasa Inggris untuk keperluan akademik dan profesional.
+
+### Materi & Metode Pembelajaran
+7.  Fokus pembelajaran adalah bahasa Inggris (*English as an International Language*).
+8.  Materi pembelajaran mencakup 4 keterampilan dasar (*Speaking, Listening, Reading, Writing*) dengan penekanan utama pada *Speaking* & *Listening*.
+9.  Topik *roleplay* dibatasi pada skenario umum seperti perkenalan, wawancara kerja, transaksi, reservasi, dan percakapan sehari-hari.
+10. Umpan balik (*feedback*) terbatas pada aspek *grammar*, *vocabulary*, dan *pronunciation* tanpa analisis mendalam intonasi atau aksen regional.
+
+### Evaluasi & Fitur
+11. Evaluasi sistem dilakukan dalam skala terbatas (1–10 pengguna uji).
+12. Fitur premium/subscription hanya berupa konsep desain, tanpa implementasi penuh *payment gateway*.
+13. Sistem tidak menyediakan sertifikasi resmi atau akreditasi seperti persiapan TOEFL/IELTS secara formal.
 
 ## 1.6 State of The Art
 Penelitian terdahulu menunjukkan bahwa teknologi STT dan TTS dapat meningkatkan motivasi belajar namun masih memiliki keterbatasan dalam naturalitas intonasi (Widyana et al., 2022; Dubey et al., 2025). Selain itu, penggunaan LLM dalam pembelajaran bahasa mampu meningkatkan keterlibatan siswa namun penerapannya dalam interaksi suara dua arah dengan avatar visual masih jarang dilakukan secara komprehensif.

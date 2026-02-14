@@ -26,7 +26,7 @@ export async function chatOpenRouter(
   opts: OpenRouterChatOptions = {}
 ) {
   const {
-    model = "moonshotai/kimi-k2:free", // lets OpenRouter route to a good default
+    model = "google/gemini-2.0-flash-lite-preview-02-05:free", // lets OpenRouter route to a good default
     temperature = 0.7,
     system,
     max_tokens,

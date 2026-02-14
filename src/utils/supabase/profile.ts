@@ -4,7 +4,8 @@ import {
     UserProfile,
     UserSettings,
     ExtendedUserSettings,
-    FrontendSettings
+    FrontendSettings,
+    PublicProfile
 } from './types';
 
 export async function getExtendedUserProfile(): Promise<ExtendedUserProfile | null> {
@@ -16,6 +17,7 @@ export async function getExtendedUserProfile(): Promise<ExtendedUserProfile | nu
     }
 
     try {
+        // 1. Get base data from Auth (fallback)
         const baseProfile: ExtendedUserProfile = {
             id: session.user.id,
             email: session.user.email || '',
@@ -24,6 +26,19 @@ export async function getExtendedUserProfile(): Promise<ExtendedUserProfile | nu
             created_at: session.user.created_at,
         };
 
+        // 2. Try to get from public_profiles (Preferred)
+        const { data: publicProfile } = await supabase
+            .from('public_profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle<PublicProfile>();
+
+        if (publicProfile) {
+            baseProfile.full_name = publicProfile.full_name || baseProfile.full_name;
+            baseProfile.avatar_url = publicProfile.avatar_url || baseProfile.avatar_url;
+        }
+
+        // 3. Get extra settings
         const { data: settings } = await supabase
             .from('user_settings')
             .select('*')
@@ -80,23 +95,42 @@ export async function updateProfile(fullName: string, avatarUrl?: string) {
         return { user: session.user, error: null };
     }
 
+    // 1. Update Auth Metadata (Legacy/Fallback)
     const { data, error } = await supabase.auth.updateUser({
         data: updateData,
     });
 
     if (error) {
         console.error('❌ Auth update error:', error);
-
-        // Handle specific errors
         if (error.message.includes('Payload too large')) {
             throw new Error('Profile data is too large. Please upload avatars to cloud storage instead of using base64.');
         }
-
         if (error.message.includes('Failed to fetch') || error.code === '0') {
             throw new Error('Network error. Please check your connection.');
         }
-
         throw new Error(error.message);
+    }
+
+    // 2. Update public_profiles (New Source of Truth)
+    try {
+        const publicProfileData: any = {
+            id: session.user.id,
+            updated_at: new Date().toISOString(),
+        };
+        if (updateData.full_name) publicProfileData.full_name = updateData.full_name;
+        if (updateData.avatar_url) publicProfileData.avatar_url = updateData.avatar_url;
+
+        const { error: publicError } = await supabase
+            .from('public_profiles')
+            .upsert(publicProfileData);
+
+        if (publicError) {
+            console.warn('⚠️ Failed to update public_profiles (table might not exist yet):', publicError.message);
+        } else {
+            console.log('✅ Updated public_profiles successfully');
+        }
+    } catch (e) {
+        console.warn('⚠️ Error updating public_profiles:', e);
     }
 
     console.log('✅ Profile updated successfully');

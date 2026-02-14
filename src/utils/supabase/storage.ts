@@ -3,8 +3,10 @@ import { createClient } from './instance';
 // ============ AVATAR STORAGE FUNCTIONS ============
 
 // Upload avatar ke Local Backend (sebagai alternatif Supabase Storage yang bermasalah)
+// Upload avatar ke Supabase Storage
 export async function uploadAvatar(file: File, userId: string): Promise<string> {
-    console.log('🔼 Uploading avatar LOCAL for user:', userId);
+    const supabase = createClient();
+    console.log('🔼 Uploading avatar to Supabase Storage for user:', userId);
 
     try {
         // 1. Validasi file
@@ -12,37 +14,39 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
             throw new Error('File must be an image (JPG, PNG, GIF)');
         }
 
-        // 2. Kompres image sebelum upload (opsional tapi bagus buat hemat bandwidth)
+        // 2. Kompres image
         const compressedFile = await compressImageFile(file);
 
-        // 3. Convert ke base64 untuk dikirim lewat JSON
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve, reject) => {
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = reject;
-        });
-        reader.readAsDataURL(compressedFile);
-        const base64Data = await base64Promise;
+        // 3. Prepare file path based on user ID
+        const fileExt = file.name.split('.').pop() || 'jpg';
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `${userId}/${fileName}`;
 
-        // 4. Upload ke endpoint local kita
-        const response = await fetch("/api/upload-avatar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, imageData: base64Data }),
-        });
+        // 4. Upload ke Storage
+        // Remove old avatars first (optional, to keep storage clean)
+        await deleteAvatar(userId);
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to upload to local storage: ${errorText}`);
+        const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, compressedFile, {
+                cacheControl: '3600',
+                upsert: true
+            });
+
+        if (uploadError) {
+            throw new Error(`Storage upload failed: ${uploadError.message}`);
         }
 
-        const { publicUrl } = await response.json();
-        console.log('✅ Avatar uploaded to local storage:', publicUrl);
+        // 5. Get Public URL
+        const { data } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
 
-        return publicUrl;
+        console.log('✅ Avatar uploaded to storage:', data.publicUrl);
+        return data.publicUrl;
 
     } catch (error) {
-        console.error('❌ uploadAvatar local error:', error);
+        console.error('❌ uploadAvatar storage error:', error);
         throw error;
     }
 }

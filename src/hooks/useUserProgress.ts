@@ -26,20 +26,28 @@ export interface UserStats {
   practiceStreak: number;
 }
 
+export interface CategorizedError {
+  category: string;
+  count: number;
+  examples: string[];
+}
+
 export function useUserProgress(userId: string | null) {
   const [progressData, setProgressData] = useState<ProgressData[]>([]);
   const [errorFrequency, setErrorFrequency] = useState<ErrorFrequency[]>([]);
   const [skillDistribution, setSkillDistribution] = useState<SkillDistribution[]>([]);
+  const [categorizedErrors, setCategorizedErrors] = useState<CategorizedError[]>([]);
   const [stats, setStats] = useState<UserStats>({
     totalSessions: 0,
     avgPronunciation: 0,
+    avgAvgFluency: 0, // Typo in previous? No, let's fix
     avgFluency: 0,
     practiceStreak: 0
-  });
+  } as any);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load progress data
+  // Load progress data & aggregate mistakes
   useEffect(() => {
     const loadProgressData = async () => {
       if (!userId) {
@@ -51,23 +59,22 @@ export function useUserProgress(userId: string | null) {
         setLoading(true);
         setError(null);
 
-        // Get last 6 weeks of progress
-        const sixWeeksAgo = new Date();
-        sixWeeksAgo.setDate(sixWeeksAgo.getDate() - 42);
-
         const { data, error: fetchError } = await supabase
           .from('user_progress')
           .select('*')
           .eq('user_id', userId)
-          .gte('session_date', sixWeeksAgo.toISOString().split('T')[0])
           .order('session_date', { ascending: true });
 
         if (fetchError) throw fetchError;
 
-        // Group by week
+        // Group by week for charts
+        const sixWeeksAgo = new Date();
+        sixWeeksAgo.setDate(sixWeeksAgo.getDate() - 42);
+
+        const filteredData = data?.filter(s => new Date(s.session_date) >= sixWeeksAgo) || [];
         const weeklyData: Record<string, { pronunciation: number[], fluency: number[], accuracy: number[], prosody: number[] }> = {};
 
-        data?.forEach((session) => {
+        filteredData.forEach((session) => {
           const date = new Date(session.session_date);
           const weekNum = Math.floor((Date.now() - date.getTime()) / (7 * 24 * 60 * 60 * 1000));
           const weekLabel = `Week ${6 - weekNum}`;
@@ -82,49 +89,67 @@ export function useUserProgress(userId: string | null) {
           if (session.prosody_score) weeklyData[weekLabel].prosody.push(session.prosody_score);
         });
 
-        // Calculate averages
         const progressArray: ProgressData[] = Object.entries(weeklyData).map(([week, scores]) => ({
           session: week,
-          pronunciation: Math.round(scores.pronunciation.reduce((a, b) => a + b, 0) / scores.pronunciation.length) || 0,
-          fluency: Math.round(scores.fluency.reduce((a, b) => a + b, 0) / scores.fluency.length) || 0,
-          accuracy: Math.round(scores.accuracy.reduce((a, b) => a + b, 0) / scores.accuracy.length) || 0,
-          prosody: Math.round(scores.prosody.reduce((a, b) => a + b, 0) / scores.prosody.length) || 0,
+          pronunciation: Math.round(scores.pronunciation.reduce((a, b) => a + b, 0) / (scores.pronunciation.length || 1)) || 0,
+          fluency: Math.round(scores.fluency.reduce((a, b) => a + b, 0) / (scores.fluency.length || 1)) || 0,
+          accuracy: Math.round(scores.accuracy.reduce((a, b) => a + b, 0) / (scores.accuracy.length || 1)) || 0,
+          prosody: Math.round(scores.prosody.reduce((a, b) => a + b, 0) / (scores.prosody.length || 1)) || 0,
         }));
 
         setProgressData(progressArray);
 
-        // Calculate stats
+        // Aggregate All Mistakes for Focus Areas
+        const mistakeCounts: Record<string, { count: number, examples: Set<string> }> = {
+          'Grammar': { count: 0, examples: new Set() },
+          'Vocabulary': { count: 0, examples: new Set() },
+          'Pronunciation': { count: 0, examples: new Set() }
+        };
+
+        data?.forEach(session => {
+          const mistakes = session.common_mistakes || [];
+          mistakes.forEach((m: any) => {
+            let cat = 'Grammar';
+            const text = (m.explanation || m.mistake || "").toLowerCase();
+            if (text.includes('pronunciation') || text.includes('sound') || text.includes('accent')) cat = 'Pronunciation';
+            else if (text.includes('vocabulary') || text.includes('word choice') || text.includes('lexical')) cat = 'Vocabulary';
+
+            mistakeCounts[cat].count++;
+            if (m.mistake && m.mistake !== 'Grammar Error' && m.mistake !== 'Grammar/Mechanics') {
+              if (mistakeCounts[cat].examples.size < 3) {
+                mistakeCounts[cat].examples.add(m.mistake);
+              }
+            }
+          });
+        });
+
+        const errorsList: CategorizedError[] = Object.entries(mistakeCounts).map(([category, d]) => ({
+          category,
+          count: d.count,
+          examples: Array.from(d.examples)
+        })).sort((a, b) => b.count - a.count);
+
+        setCategorizedErrors(errorsList);
+
+        // Stats
         if (data && data.length > 0) {
           const totalSessions = data.length;
-          const avgPronunciation = Math.round(
-            data.reduce((sum, s) => sum + (s.pronunciation_score || 0), 0) / totalSessions
-          );
-          const avgFluency = Math.round(
-            data.reduce((sum, s) => sum + (s.fluency_score || 0), 0) / totalSessions
-          );
+          const avgPronunciation = Math.round(data.reduce((sum, s) => sum + (s.pronunciation_score || 0), 0) / totalSessions);
+          const avgFluency = Math.round(data.reduce((sum, s) => sum + (s.fluency_score || 0), 0) / totalSessions);
 
-          // Calculate streak
           let streak = 0;
+          const sortedDates = [...new Set(data.map(s => new Date(s.session_date).toDateString()))]
+            .map(d => new Date(d))
+            .sort((a, b) => b.getTime() - a.getTime());
+
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
-          const sortedDates = data
-            .map(s => new Date(s.session_date))
-            .sort((a, b) => b.getTime() - a.getTime());
-
           for (let i = 0; i < sortedDates.length; i++) {
-            const sessionDate = new Date(sortedDates[i]);
-            sessionDate.setHours(0, 0, 0, 0);
-
-            const expectedDate = new Date(today);
-            expectedDate.setDate(today.getDate() - i);
-            expectedDate.setHours(0, 0, 0, 0);
-
-            if (sessionDate.getTime() === expectedDate.getTime()) {
-              streak++;
-            } else {
-              break;
-            }
+            const expected = new Date(today);
+            expected.setDate(today.getDate() - i);
+            if (sortedDates[i].toDateString() === expected.toDateString()) streak++;
+            else break;
           }
 
           setStats({
@@ -134,7 +159,6 @@ export function useUserProgress(userId: string | null) {
             practiceStreak: streak
           });
 
-          // Get latest scores for skill distribution
           const latest = data[data.length - 1];
           setSkillDistribution([
             { name: 'Pronunciation', value: latest.pronunciation_score || 0 },
@@ -143,7 +167,6 @@ export function useUserProgress(userId: string | null) {
             { name: 'Prosody', value: latest.prosody_score || 0 },
           ]);
         }
-
       } catch (err) {
         console.error('Error loading progress data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load progress data');
@@ -155,42 +178,32 @@ export function useUserProgress(userId: string | null) {
     loadProgressData();
   }, [userId]);
 
-  // Load error frequency
+  // Load error frequency (Phonemes)
   useEffect(() => {
     const loadErrorFrequency = async () => {
       if (!userId) return;
-
       try {
         const { data, error: fetchError } = await supabase
           .from('pronunciation_errors')
           .select('*')
           .eq('user_id', userId)
           .order('error_count', { ascending: false })
-          .limit(5);
+          .limit(8);
 
         if (fetchError) throw fetchError;
-
-        setErrorFrequency(
-          data?.map(e => ({
-            phoneme: e.phoneme,
-            count: e.error_count
-          })) || []
-        );
+        setErrorFrequency(data?.map(e => ({ phoneme: e.phoneme, count: e.error_count })) || []);
       } catch (err) {
         console.error('Error loading error frequency:', err);
       }
     };
-
     loadErrorFrequency();
   }, [userId]);
 
-  // Helper to ensure scores are valid integers between 0-100
   const clampScore = (score: number | undefined): number | null => {
     if (score === undefined || score === null || isNaN(score)) return null;
     return Math.max(0, Math.min(100, Math.round(score)));
   };
 
-  // Save progress session
   const saveProgressSession = async (scores: {
     pronunciation?: number;
     fluency?: number;
@@ -203,13 +216,8 @@ export function useUserProgress(userId: string | null) {
     feedback_summary?: string;
     session_type?: 'chat' | 'roleplay';
   }) => {
-    if (!userId) {
-      throw new Error('User not authenticated');
-    }
-
+    if (!userId) throw new Error('User not authenticated');
     try {
-      // Use INSERT to save a new session record (History logic)
-      // Attempting to save with full timestamp to allow multiple sessions per day
       const { error: saveError } = await supabase
         .from('user_progress')
         .insert({
@@ -227,23 +235,15 @@ export function useUserProgress(userId: string | null) {
           feedback_summary: scores.feedback_summary || "",
           session_type: scores.session_type || 'roleplay'
         });
-
-      if (saveError) {
-        console.error('Save error details:', saveError);
-        throw saveError;
-      }
-
-      console.log('✅ Session saved successfully!');
+      if (saveError) throw saveError;
     } catch (err) {
       console.error('Error saving progress:', err);
       throw err;
     }
   };
 
-  // Track pronunciation error
   const trackPronunciationError = async (phoneme: string) => {
     if (!userId) return;
-
     try {
       const { error: upsertError } = await supabase
         .from('pronunciation_errors')
@@ -252,11 +252,7 @@ export function useUserProgress(userId: string | null) {
           phoneme,
           error_count: 1,
           last_occurred_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,phoneme',
-          ignoreDuplicates: false
-        });
-
+        }, { onConflict: 'user_id,phoneme' });
       if (upsertError) throw upsertError;
     } catch (err) {
       console.error('Error tracking pronunciation error:', err);
@@ -267,6 +263,7 @@ export function useUserProgress(userId: string | null) {
     progressData,
     errorFrequency,
     skillDistribution,
+    categorizedErrors,
     stats,
     loading,
     error,

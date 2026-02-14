@@ -76,14 +76,6 @@ export const AvatarConfig: React.FC<AvatarConfigProps> = ({
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
         <h3 className="text-gray-800 font-semibold text-lg mb-4 text-center">Main Settings</h3>
         <div className="space-y-4">
-          <Field label="Custom Knowledge Base ID">
-            <Input
-              placeholder="Enter custom knowledge base ID"
-              value={config.knowledgeId}
-              onChange={(value) => onChange("knowledgeId", value)}
-              className="text-gray-800 bg-white border-blue-300 placeholder:text-gray-500"
-            />
-          </Field>
           <Field label="Avatar ID">
             <div className="bg-white border border-blue-300 rounded-lg">
               <Select

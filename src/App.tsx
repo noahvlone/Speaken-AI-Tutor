@@ -2,8 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Navigation } from './components/Navigation';
 import { HomePage } from './components/HomePage';
-import { ChatPage } from './components/ChatPage';
-import { RoleplayPage } from './components/RoleplayPage';
+import { TextChatPage } from './components/TextChatPage';
+import { ChatSelectionPage } from './components/ChatSelectionPage';
+import { AvatarSessionPage } from './components/AvatarSessionPage';
+import { RoleplaySelectionPage } from './components/RoleplaySelectionPage';
 import { RoleplayHistoryPage } from './components/RoleplayHistoryPage';
 import { SessionDetailPage } from './components/SessionDetailPage';
 import { ProgressPage } from './components/ProgressPage';
@@ -14,9 +16,14 @@ import { LoginPage } from './components/LoginPage';
 import { RegisterPage } from './components/RegisterPage';
 import { LogoutModal } from './components/LogoutModal';
 import { OnboardingPage } from './components/OnboardingPage';
+import { VocabularyPage } from './components/VocabularyPage';
+import { GrammarPage } from './components/GrammarPage';
 import { ResultSummaryPage } from './components/ResultSummaryPage';
+import { ChatResultPage } from './components/ChatResultPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Leaderboard } from './components/Leaderboard';
+import { GrammarChallengePage } from './components/GrammarChallengePage';
+import { PronunciationChallengePage } from './components/PronunciationChallengePage';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toaster } from './components/ui/sonner';
 import { toast } from 'sonner';
@@ -86,16 +93,24 @@ export default function App() {
                       <div className="h-full">
                         <Routes>
                           <Route path="/home" element={<HomePage userName={user?.full_name || 'User'} />} />
-                          <Route path="/chat" element={<ChatPage userId={user?.id || null} />} />
-                          <Route path="/roleplay" element={<RoleplayPage />} />
+                          <Route path="/chat" element={<ChatSelectionPage />} />
+                          <Route path="/chat/free" element={<TextChatPage userId={user?.id || null} />} />
+                          <Route path="/chat/roleplay" element={<RoleplaySelectionPage />} />
+                          <Route path="/chat/roleplay/:scenarioId" element={<TextChatPage userId={user?.id || null} />} />
+                          <Route path="/roleplay" element={<AvatarSessionPage />} />
                           <Route path="/progress" element={<ProgressPage />} />
                           <Route path="/history" element={<RoleplayHistoryPage />} />
                           <Route path="/history/:sessionId" element={<SessionDetailPage />} />
                           <Route path="/challenge" element={<DailyChallengePage />} />
+                          <Route path="/challenge/grammar" element={<GrammarChallengePage />} />
+                          <Route path="/challenge/pronunciation" element={<PronunciationChallengePage />} />
                           <Route path="/leaderboard" element={<Leaderboard />} />
                           <Route path="/settings" element={<SettingsPage userProfile={user} />} />
                           <Route path="/profile" element={<ProfilePage userProfile={user} />} />
+                          <Route path="/library/vocabulary" element={<VocabularyPage />} />
+                          <Route path="/library/grammar" element={<GrammarPage />} />
                           <Route path="/result-summary" element={<ResultSummaryPage />} />
+                          <Route path="/result-chat" element={<ChatResultPage />} />
                           <Route path="/" element={<Navigate to="/home" replace />} />
                         </Routes>
                       </div>

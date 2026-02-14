@@ -269,24 +269,64 @@ export function ProgressPage() {
           <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-white/60">
             <h3 className="mb-6">Focus Areas</h3>
             <div className="space-y-4">
-              <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                <h4 className="mb-2">Needs Practice</h4>
-                <p className="text-muted-foreground">
-                  The "th" sound (θ, ð) - Practice words: think, this, brother
-                </p>
-              </div>
-              <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
-                <h4 className="mb-2">Improving</h4>
-                <p className="text-muted-foreground">
-                  The "r" sound - Continue practicing: right, wrong, career
-                </p>
-              </div>
-              <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-                <h4 className="mb-2">Great Job!</h4>
-                <p className="text-muted-foreground">
-                  Vowel sounds - Your vowel pronunciation is excellent
-                </p>
-              </div>
+              {/* Needs Practice - Top Error */}
+              {errorFrequency.length > 0 ? (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <h4 className="mb-2 font-bold text-red-800">Needs Practice</h4>
+                  <p className="text-red-600 text-sm">
+                    Most frequent error: <span className="font-bold">"{errorFrequency[0].phoneme}"</span> ({errorFrequency[0].count} times).
+                    Try practicing words with this sound.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                  <h4 className="mb-2 font-bold text-slate-700">Needs Practice</h4>
+                  <p className="text-slate-500 text-sm">
+                    Practice more to identify specific areas for improvement.
+                  </p>
+                </div>
+              )}
+
+              {/* Improving - Second Top Error or Random Skill */}
+              {errorFrequency.length > 1 ? (
+                <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                  <h4 className="mb-2 font-bold text-orange-800">Keep Improving</h4>
+                  <p className="text-orange-600 text-sm">
+                    Watch out for <span className="font-bold">"{errorFrequency[1].phoneme}"</span>.
+                    You're getting better!
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                  <h4 className="mb-2 font-bold text-orange-800">Keep Improving</h4>
+                  <p className="text-orange-600 text-sm">
+                    Consistency is key. Keep your streak alive!
+                  </p>
+                </div>
+              )}
+
+              {/* Great Job - Best Skill */}
+              {skillDistribution.length > 0 ? (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                  <h4 className="mb-2 font-bold text-green-800">Great Job!</h4>
+                  {(() => {
+                    const bestSkill = [...skillDistribution].sort((a, b) => b.value - a.value)[0];
+                    return (
+                      <p className="text-green-600 text-sm">
+                        Your <span className="font-bold">{bestSkill.name}</span> is strong ({bestSkill.value}%).
+                        Keep it up!
+                      </p>
+                    );
+                  })()}
+                </div>
+              ) : (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                  <h4 className="mb-2 font-bold text-green-800">Great Job!</h4>
+                  <p className="text-green-600 text-sm">
+                    Start your first session to see your strongest skills.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

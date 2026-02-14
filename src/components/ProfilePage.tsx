@@ -12,7 +12,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type SetStateAction } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import {
@@ -25,7 +25,8 @@ import {
   frontendToDBSettings,
   dbToFrontendSettings,
   FrontendSettings,
-  uploadAvatar // ⭐ IMPORT function baru untuk upload ke storage
+  uploadAvatar,
+  createClient
 } from '../utils/supabase/client';
 
 interface ProfilePageProps {
@@ -475,17 +476,30 @@ export function ProfilePage({ userProfile, onProfileUpdate }: ProfilePageProps) 
 
     setIsChangingPassword(true);
 
-    // Note: Supabase tidak menyediakan password update via client SDK
-    // Untuk update password, perlu menggunakan reset password flow atau Edge Function
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
 
-    setIsChangingPassword(false);
-    setShowPasswordModal(false);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setErrors({});
-    toast.success('Password changed successfully! 🔒');
+      if (error) throw error;
+
+      setIsChangingPassword(false);
+      setShowPasswordModal(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setErrors({});
+      toast.success('Password changed successfully! 🔒');
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setIsChangingPassword(false);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to change password');
+      }
+    }
   };
 
   // Loading state
@@ -856,7 +870,7 @@ export function ProfilePage({ userProfile, onProfileUpdate }: ProfilePageProps) 
               <Label htmlFor="learningGoal" className="mb-2 block">
                 Learning Goal
               </Label>
-              <Select value={learningGoal} onValueChange={(value) => {
+              <Select value={learningGoal} onValueChange={(value: SetStateAction<string>) => {
                 setLearningGoal(value);
                 checkForChanges();
               }}>
@@ -879,7 +893,7 @@ export function ProfilePage({ userProfile, onProfileUpdate }: ProfilePageProps) 
               <Label htmlFor="currentLevel" className="mb-2 block">
                 Current Level
               </Label>
-              <Select value={currentLevel} onValueChange={(value) => {
+              <Select value={currentLevel} onValueChange={(value: SetStateAction<string>) => {
                 setCurrentLevel(value);
                 checkForChanges();
               }}>

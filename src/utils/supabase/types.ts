@@ -6,6 +6,15 @@ export interface UserProfile {
     avatar_url?: string;
 }
 
+export interface PublicProfile {
+    id: string;
+    username: string | null;
+    full_name: string | null;
+    avatar_url: string | null;
+    website?: string | null;
+    updated_at?: string | null;
+}
+
 export interface ExtendedUserProfile extends UserProfile {
     phone?: string;
     location?: string;
